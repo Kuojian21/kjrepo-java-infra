@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>kjrepo-infra</groupId>
+		<artifactId>kjrepo-infra</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>kjrepo-infra-register</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>kjrepo-infra</groupId>
+			<artifactId>kjrepo-infra-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>kjrepo-infra</groupId>
+			<artifactId>kjrepo-infra-text</artifactId>
+		</dependency>
+		<!--
+		https://mvnrepository.com/artifact/org.apache.curator/curator-framework -->
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-framework</artifactId>
+			<version>5.8.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--
+		https://mvnrepository.com/artifact/org.apache.curator/curator-recipes -->
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-recipes</artifactId>
+			<version>5.8.0</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+</project>
