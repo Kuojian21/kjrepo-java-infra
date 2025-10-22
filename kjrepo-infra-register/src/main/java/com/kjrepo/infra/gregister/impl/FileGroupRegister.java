@@ -26,7 +26,7 @@ public class FileGroupRegister<V, I> extends AbstractGroupReigster<V, I> {
 	public FileGroupRegister(String workspace, Class<V> vclazz, Class<I> clazz) {
 		super(new FileRegister<I>(workspace, clazz));
 		this.workspace = workspace;
-		this.vregister = new FileRegister<>(vclazz);
+		this.vregister = new FileRegister<>(this.workspace, vclazz);
 	}
 
 	@Override

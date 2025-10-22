@@ -30,20 +30,20 @@ import com.kjrepo.infra.register.context.RegisterFactory;
 
 public class BinlogEventListener implements EventListener {
 
-	private final Logger logger = LoggerUtils.logger();
+	private final Logger logger = LoggerUtils.logger(getClass());
 
 	private final ConcurrentMap<Long, TableMapEventData> tableMapRepo = Maps.newConcurrentMap();
 	private final Map<String, BinlogResolver<?>> resolvers;
-	private final LazySupplier<AtomicReference<ClientStatusInfo>> statusInfoRef;
-	private final Register<ClientStatusInfo> register;
+	private final LazySupplier<AtomicReference<BinlogStatusInfo>> statusInfoRef;
+	private final Register<BinlogStatusInfo> register;
 
 	public BinlogEventListener(BinlogRunner runner) {
 		super();
-		this.register = RegisterFactory.getContext(runner.getClass()).getRegister(ClientStatusInfo.class);
+		this.register = RegisterFactory.getContext(runner.getClass()).getRegister(BinlogStatusInfo.class);
 		this.resolvers = Stream.of(runner.resolvers().entrySet())
 				.collect(Collectors.toMap(e -> e.getKey().toLowerCase(), Map.Entry::getValue));
 		this.statusInfoRef = LazySupplier.wrap(() -> {
-			AtomicReference<ClientStatusInfo> ref = new AtomicReference<ClientStatusInfo>(register.get(runner.ID()));
+			AtomicReference<BinlogStatusInfo> ref = new AtomicReference<BinlogStatusInfo>(register.get(runner.ID()));
 			Thread thread = new Thread(new Runnable() {
 				@Override
 				public void run() {
@@ -71,7 +71,7 @@ public class BinlogEventListener implements EventListener {
 			statusInfoRef.get().get().setGtidSet(data.getMySqlGtid().toString());
 		} else if (eventType == EventType.ROTATE) {
 			RotateEventData data = event.getData();
-			ClientStatusInfo statusInfo = statusInfoRef.get().get().clone();
+			BinlogStatusInfo statusInfo = statusInfoRef.get().get().clone();
 			statusInfo.setBinlogFilename(data.getBinlogFilename());
 			statusInfo.setBinlogPosition(data.getBinlogPosition());
 			statusInfoRef.get().set(statusInfo);
@@ -120,7 +120,7 @@ public class BinlogEventListener implements EventListener {
 	private BinlogResolver<?> resolver(long tableId) {
 		TableMapEventData tableMap = tableMapRepo.get(tableId);
 		if (tableMap == null) {
-			ClientStatusInfo statusInfo = statusInfoRef.get().get();
+			BinlogStatusInfo statusInfo = statusInfoRef.get().get();
 			logger.error("no TableMapEventData binlogFilename:{} binlogPosition:{}", statusInfo.getBinlogFilename(),
 					statusInfo.getBinlogPosition());
 			return null;

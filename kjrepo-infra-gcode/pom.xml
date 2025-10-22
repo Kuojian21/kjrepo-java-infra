@@ -1,0 +1,29 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>kjrepo-infra</groupId>
+		<artifactId>kjrepo-infra</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>kjrepo-infra-gcode</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>kjrepo-infra</groupId>
+			<artifactId>kjrepo-infra-text</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>kjrepo-infra</groupId>
+			<artifactId>kjrepo-infra-storage</artifactId>
+		</dependency>
+		<!--
+		https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>4.33.0</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+</project>

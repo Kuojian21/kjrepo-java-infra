@@ -8,18 +8,15 @@ import com.google.common.collect.Maps;
 import com.kjrepo.infra.cluster.Cluster;
 import com.kjrepo.infra.cluster.ClusterFactory;
 import com.kjrepo.infra.cluster.ClusterInfo;
-import com.kjrepo.infra.cluster.instance.InstanceInfo;
 import com.kjrepo.infra.common.lazy.LazySupplier;
 import com.kjrepo.infra.common.logger.LoggerUtils;
-import com.kjrepo.infra.register.Register;
-import com.kjrepo.infra.register.context.RegisterFactory;
 import com.kjrepo.infra.text.json.utils.TypeMapperUtils;
 
-public interface ClusterResource<R, I> {
+public interface ClusterResource<R, I, C extends ClusterInfo<I>> {
 
 	String ID();
 
-	Function<InstanceInfo<I>, R> mapper();
+	Function<I, R> mapper();
 
 	ConcurrentMap<Object, LazySupplier<?>> resources = Maps.newConcurrentMap();
 
@@ -29,13 +26,10 @@ public interface ClusterResource<R, I> {
 		if (resource == null) {
 			Class<R> rclazz = (Class<R>) TypeMapperUtils.mapper(getClass()).get(ClusterResource.class)
 					.get(ClusterResource.class.getTypeParameters()[0]);
-			Class<?> cclazz = (Class<?>) TypeMapperUtils.mapper(getClass()).get(ClusterResource.class)
+			Class<C> cclazz = (Class<C>) TypeMapperUtils.mapper(getClass()).get(ClusterResource.class)
 					.get(ClusterResource.class.getTypeParameters()[2]);
-			Register<ClusterInfo<?>> register = (Register<ClusterInfo<?>>) RegisterFactory.getContext(getClass())
-					.getRegister(cclazz);
-			resource = (LazySupplier<Cluster<R>>) resources.computeIfAbsent(this,
-					k -> LazySupplier.wrap(() -> (Cluster<R>) ClusterFactory.cluster(rclazz, register, ID(), mapper(),
-							res -> close((R) res))));
+			resource = (LazySupplier<Cluster<R>>) resources.computeIfAbsent(this, k -> ClusterFactory.cluster(rclazz,
+					cclazz, ID(), info -> mapper().apply(info.getInfo()), res -> close((R) res)));
 
 		}
 		return resource.get();

@@ -5,7 +5,8 @@ import java.util.concurrent.locks.Lock;
 
 import com.annimon.stream.function.Supplier;
 
-public class LazySupplier<T> implements Supplier<T> {
+public class LazySupplier<T>
+		implements Supplier<T>, com.google.common.base.Supplier<T>, java.util.function.Supplier<T> {
 
 	public static <T> LazySupplier<T> wrap(Supplier<T> supplier) {
 		return new LazySupplier<T>(supplier);

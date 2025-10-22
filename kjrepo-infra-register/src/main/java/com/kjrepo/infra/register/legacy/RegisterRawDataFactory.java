@@ -10,7 +10,7 @@ import com.kjrepo.infra.common.logger.LoggerUtils;
 
 public class RegisterRawDataFactory {
 
-	private static final Logger logger = LoggerUtils.logger();
+	private static final Logger logger = LoggerUtils.logger(IRegisterRawDataHandler.class);
 	private static final List<IRegisterRawDataHandler> handlers;
 	static {
 		try {

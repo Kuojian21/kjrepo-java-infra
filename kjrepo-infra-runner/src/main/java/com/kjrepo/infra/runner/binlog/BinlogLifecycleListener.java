@@ -13,19 +13,19 @@ public class BinlogLifecycleListener implements LifecycleListener {
 
 	private final Logger logger = LoggerUtils.logger(getClass());
 	private final BinlogRunner runner;
-	private final Register<ClientStatusInfo> register;
+	private final Register<BinlogStatusInfo> register;
 
 	public BinlogLifecycleListener(BinlogRunner runner) {
 		this.runner = runner;
-		this.register = RegisterFactory.getContext(runner.getClass()).getRegister(ClientStatusInfo.class);
+		this.register = RegisterFactory.getContext(runner.getClass()).getRegister(BinlogStatusInfo.class);
 	}
 
 	@Override
 	public void onConnect(BinaryLogClient client) {
 		TermHelper.addTerm(runner.module(), () -> client.disconnect());
-		ClientStatusInfo info = register.get(runner.ID());
+		BinlogStatusInfo info = register.get(runner.ID());
 		if (info == null) {
-			info = new ClientStatusInfo();
+			info = new BinlogStatusInfo();
 			info.setBinlogFilename(client.getBinlogFilename());
 			info.setBinlogPosition(client.getBinlogPosition());
 			info.setGtidSet(client.getGtidSet());

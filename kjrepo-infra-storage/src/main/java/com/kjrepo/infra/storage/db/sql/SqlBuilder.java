@@ -2,33 +2,34 @@ package com.kjrepo.infra.storage.db.sql;
 
 import java.util.Map;
 
-import com.google.common.collect.Maps;
-import com.kjrepo.infra.storage.db.model.Model;
+import com.kjrepo.infra.storage.db.model.KdbModel;
 
 public abstract class SqlBuilder {
 
-	protected final Model model;
-	protected final StringBuilder sql = new StringBuilder();
-	protected final Map<String, Object> valueMap = Maps.newHashMap();
+	private final KdbModel kdbModel;
 
-	protected SqlBuilder(Model model) {
-		this.model = model;
+	protected SqlBuilder(KdbModel kdbModel) {
+		this.kdbModel = kdbModel;
 	}
 
-	public static SqlInsertBuilder insert(Model model, String table) {
-		return new SqlInsertBuilder(model, table);
+	public static SqlInsertBuilder insert(KdbModel kdbModel, String table) {
+		return new SqlInsertBuilder(kdbModel, table);
 	}
 
-	public static SqlSelectBuilder select(Model model, String table) {
-		return new SqlSelectBuilder(model, table);
+	public static SqlSelectBuilder select(KdbModel kdbModel, String table) {
+		return new SqlSelectBuilder(kdbModel, table);
 	}
 
-	public static SqlUpdateBuilder update(Model model, String table) {
-		return new SqlUpdateBuilder(model, table);
+	public static SqlUpdateBuilder update(KdbModel kdbModel, String table, Map<String, Object> update) {
+		return new SqlUpdateBuilder(kdbModel, table, update);
 	}
 
-	public static SqlDeleteBuilder delete(Model model, String table) {
-		return new SqlDeleteBuilder(model, table);
+	public static SqlDeleteBuilder delete(KdbModel kdbModel, String table) {
+		return new SqlDeleteBuilder(kdbModel, table);
+	}
+
+	public KdbModel model() {
+		return this.kdbModel;
 	}
 
 	public abstract String sql();

@@ -8,7 +8,7 @@ public interface DLock {
 
 	boolean tryLock();
 
-	boolean tryLock(long time, TimeUnit unit);
+	boolean tryLock(long timeout, TimeUnit unit);
 
 	void unlock();
 }

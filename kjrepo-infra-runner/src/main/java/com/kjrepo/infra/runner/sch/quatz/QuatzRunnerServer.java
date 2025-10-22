@@ -32,7 +32,7 @@ public class QuatzRunnerServer extends AbstractRunnerServer<QuatzRunner> {
 			// return Scheduler sch = StdSchedulerFactory.getDefaultScheduler();
 			Scheduler sch = new QuatzStdSchedulerFactory(properties()).getScheduler();
 			sch.start();
-			TermHelper.addTerm("Scheduler", () -> sch.shutdown());
+			TermHelper.addTerm("Scheduler", () -> sch.shutdown(true));
 			QuatzJobStat job = new QuatzJobStat(sch);
 			sch.scheduleJob(QuatzJobDetailBuilder.job(job).withIdentity(job.name(), job.group()).build(),
 					TriggerBuilder.newTrigger().withIdentity(job.name(), job.group()).startNow()

@@ -8,7 +8,7 @@ import com.kjrepo.infra.text.json.ConfigUtils;
 
 public class BrowserUtils {
 
-	public static final Logger logger = LoggerUtils.logger();
+	public static final Logger logger = LoggerUtils.logger(BrowserUtils.class);
 
 	public static WebClient client(BrowserInfo info) throws Exception {
 		WebClient webClient = new WebClient(info.toBrowserVersion());

@@ -17,7 +17,7 @@ import com.kjrepo.infra.text.json.config.MethodConfig;
 
 public class InvokerUtils {
 
-	private static final Logger logger = LoggerUtils.logger();
+	private static final Logger logger = LoggerUtils.logger(InvokerUtils.class);
 
 	public static Object invokeList(Object obj, List<?> list) {
 		try {

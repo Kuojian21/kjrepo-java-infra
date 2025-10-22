@@ -5,7 +5,8 @@ import java.util.Map;
 
 import com.annimon.stream.function.ThrowableFunction;
 import com.google.common.collect.Maps;
-import com.kjrepo.infra.common.utils.HumanUtils;
+import com.kjrepo.infra.common.number.N_humanUtils;
+import com.kjrepo.infra.common.number.N_zhUtils;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -36,7 +37,8 @@ public class Freemarker {
 			Template template = function.apply(this.cfg);
 			StringWriter out = new StringWriter();
 			Map<String, Object> obj = Maps.newHashMap(data);
-			obj.put("HumanUtils", new HumanUtils());
+			obj.put("N_humanUtils", new N_humanUtils());
+			obj.put("N_zhUtils", new N_zhUtils());
 			template.process(obj, out);
 			return out.toString();
 		} catch (Exception e) {

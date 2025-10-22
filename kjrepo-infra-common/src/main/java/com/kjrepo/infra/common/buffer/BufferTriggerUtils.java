@@ -47,7 +47,7 @@ class BufferTriggerUtils {
 
 	static class DefaultRejectHandler<E> implements BufferTriggerRejectHandler<E> {
 
-		private static final Logger logger = LoggerUtils.logger();
+		private static final Logger logger = LoggerUtils.logger(DefaultRejectHandler.class);
 
 		@Override
 		public boolean onReject(E element, Condition condition) {

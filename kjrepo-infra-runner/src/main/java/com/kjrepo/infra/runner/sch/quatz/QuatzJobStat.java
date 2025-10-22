@@ -13,7 +13,7 @@ import com.kjrepo.infra.trace.utils.TraceIDUtils;
 
 public class QuatzJobStat implements Job {
 
-	private final Logger logger = LoggerUtils.logger();
+	private final Logger logger = LoggerUtils.logger(getClass());
 
 	private final Scheduler scheduler;
 

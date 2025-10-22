@@ -40,7 +40,7 @@ public class KDisruptor<T> {
 		return new KDisruptor<T>(ringBufferSize, threadFactory, producerType, waitStrategy);
 	}
 
-	private final Logger logger = LoggerUtils.logger();
+	private final Logger logger = LoggerUtils.logger(getClass());
 	private final Disruptor<KDisruptorEvent<T>> disruptor;
 	private final List<KDisruptorHandler<T>> handlers;
 

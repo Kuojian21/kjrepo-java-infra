@@ -13,7 +13,7 @@ import com.kjrepo.infra.text.json.JsonUtils;
 
 public interface Config {
 
-	Logger logger = LoggerUtils.logger();
+	Logger logger = LoggerUtils.logger(Config.class);
 
 	<T> T config(T obj, List<Map<String, Object>> jsons);
 

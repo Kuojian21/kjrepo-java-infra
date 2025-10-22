@@ -11,6 +11,7 @@ import com.github.phantomthief.util.ThrowableRunnable;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Sets;
 import com.kjrepo.infra.common.logger.LoggerUtils;
+import com.kjrepo.infra.common.number.N_humanUtils;
 
 public class TermHelper {
 
@@ -31,7 +32,7 @@ public class TermHelper {
 		return stopping.get();
 	}
 
-	private static final Logger logger = LoggerUtils.logger();
+	private static final Logger logger = LoggerUtils.logger(TermHelper.class);
 	private static final AtomicBoolean stopping = new AtomicBoolean(false);
 	private static final Set<Term> terms = Sets.newConcurrentHashSet();
 	private static final AtomicInteger defTermsPriority = new AtomicInteger(0);
@@ -39,15 +40,16 @@ public class TermHelper {
 		SignalHelper.handle("TERM", signal -> {
 			try {
 				stopping.set(true);
-				terms.stream().sorted((a, b) -> a.getPriority() - b.getPriority()).forEach(term -> {
+				terms.stream().sorted((a, b) -> Integer.compare(a.getPriority(), b.getPriority())).forEach(term -> {
 					Stopwatch stopwatch = Stopwatch.createStarted();
 					try {
 						term.getRunnable().run();
 						logger.info("Signal-TERM FINISH module:{} priority:{} elapsed:{}s", term.getModule(),
-								term.getPriority(), stopwatch.elapsed(TimeUnit.SECONDS));
+								term.getPriority(), N_humanUtils.formatMills(stopwatch.elapsed(TimeUnit.MILLISECONDS)));
 					} catch (Throwable e) {
 						logger.error("Signal-TERM ERROR module:{} priority:{} elapsed:{}s", term.getModule(),
-								term.getPriority(), stopwatch.elapsed(TimeUnit.SECONDS), e);
+								term.getPriority(), N_humanUtils.formatMills(stopwatch.elapsed(TimeUnit.MILLISECONDS)),
+								e);
 					}
 				});
 			} finally {

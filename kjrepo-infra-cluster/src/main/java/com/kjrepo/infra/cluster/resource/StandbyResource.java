@@ -10,8 +10,6 @@ import com.kjrepo.infra.cluster.standby.StandbyFactory;
 import com.kjrepo.infra.cluster.standby.StandbyInfo;
 import com.kjrepo.infra.common.lazy.LazySupplier;
 import com.kjrepo.infra.common.logger.LoggerUtils;
-import com.kjrepo.infra.register.Register;
-import com.kjrepo.infra.register.context.RegisterFactory;
 import com.kjrepo.infra.text.json.utils.TypeMapperUtils;
 
 public interface StandbyResource<R, I, C extends StandbyInfo<I>> {
@@ -30,9 +28,8 @@ public interface StandbyResource<R, I, C extends StandbyInfo<I>> {
 					.get(StandbyResource.class.getTypeParameters()[0]);
 			Class<C> cclazz = (Class<C>) TypeMapperUtils.mapper(getClass()).get(StandbyResource.class)
 					.get(StandbyResource.class.getTypeParameters()[2]);
-			Register<C> register = RegisterFactory.getContext(getClass()).getRegister(cclazz);
-			resource = (LazySupplier<Standby<R>>) resources.computeIfAbsent(this, k -> LazySupplier.wrap(
-					() -> StandbyFactory.standby(rclazz, cclazz, register, ID(), mapper(), res -> close((R) res))));
+			resource = (LazySupplier<Standby<R>>) resources.computeIfAbsent(this,
+					k -> StandbyFactory.standby(rclazz, cclazz, ID(), mapper(), res -> close((R) res)));
 
 		}
 		return resource.get();

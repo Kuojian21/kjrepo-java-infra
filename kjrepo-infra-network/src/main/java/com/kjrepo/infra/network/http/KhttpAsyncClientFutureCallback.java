@@ -8,7 +8,7 @@ import com.kjrepo.infra.common.logger.LoggerUtils;
 
 public class KhttpAsyncClientFutureCallback<T, E extends Exception> implements FutureCallback<HttpResponse> {
 
-	private final Logger logger = LoggerUtils.logger();
+	private final Logger logger = LoggerUtils.logger(getClass());
 
 	@Override
 	public void completed(HttpResponse response) {

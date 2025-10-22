@@ -7,7 +7,7 @@ import com.lmax.disruptor.EventHandler;
 
 public class KDisruptorEventHandler<T> implements EventHandler<KDisruptorEvent<T>> {
 
-	private final Logger logger = LoggerUtils.logger();
+	private final Logger logger = LoggerUtils.logger(getClass());
 	private final KDisruptorHandler<T> handler;
 
 	public KDisruptorEventHandler(KDisruptorHandler<T> handler) {

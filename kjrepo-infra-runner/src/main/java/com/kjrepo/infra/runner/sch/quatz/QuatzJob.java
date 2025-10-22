@@ -12,14 +12,15 @@ import com.annimon.stream.Optional;
 import com.annimon.stream.function.Supplier;
 import com.google.common.base.Stopwatch;
 import com.kjrepo.infra.common.logger.LoggerUtils;
-import com.kjrepo.infra.common.utils.HumanUtils;
+import com.kjrepo.infra.common.number.N_humanUtils;
+import com.kjrepo.infra.common.term.TermHelper;
 import com.kjrepo.infra.reporter.utils.Reporter;
 import com.kjrepo.infra.runner.sch.SchElapsedIReporterBean;
 import com.kjrepo.infra.trace.utils.TraceIDUtils;
 
 public class QuatzJob implements Job {
 
-	private final Logger logger = LoggerUtils.logger();
+	private final Logger logger = LoggerUtils.logger(QuatzJob.class);
 	private final QuatzRunner job;
 
 	public QuatzJob(QuatzRunner job) {
@@ -28,7 +29,9 @@ public class QuatzJob implements Job {
 
 	@Override
 	public final void execute(JobExecutionContext context) throws JobExecutionException {
-		TraceIDUtils.generate();
+		if (TermHelper.isStopping()) {
+			return;
+		}
 		Stopwatch stopwatch = Stopwatch.createStarted();
 		Supplier<String> supplier = () -> new StringSubstitutor(key -> {
 			switch (key) {
@@ -39,14 +42,20 @@ public class QuatzJob implements Job {
 			case "clazz":
 				return job.getClass().getName();
 			case "elapsed":
-				return HumanUtils.formatMills(stopwatch.elapsed(TimeUnit.MILLISECONDS));
+				return N_humanUtils.formatMills(stopwatch.elapsed(TimeUnit.MILLISECONDS));
 			case "concurrent":
 				return job.isConcurrentRunning() + "";
 			default:
 				return "";
 			}
 		}).replace("job:${group}.${name} concurrent:${concurrent} class:${clazz} elapsed:${elapsed}");
+//		DLock lock = DLockFactory.getContext(getClass())
+//				.getLock(StringUtils.isEmpty(this.job.ID()) ? null
+//						: "/lock/quatz/" + this.job.ID() + "/"
+//								+ DateFormatUtils.format(context.getScheduledFireTime(), "yyyyMMddHHmmss"));
+//		if (lock.tryLock()) {
 		try {
+			TraceIDUtils.generate();
 			this.job.run();
 			logger.info(supplier.get());
 		} catch (Throwable e) {
@@ -55,5 +64,6 @@ public class QuatzJob implements Job {
 			Reporter.report(new SchElapsedIReporterBean(job, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
 			TraceIDUtils.clear();
 		}
+//		}
 	}
 }

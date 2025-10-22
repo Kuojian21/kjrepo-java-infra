@@ -4,6 +4,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.IntStream;
@@ -26,6 +27,10 @@ public class ParameterizedTypeValue extends AbstractValue<ParameterizedType> {
 				return (V) Stream.of((List<?>) json)
 						.map(o -> ConfigUtils.valueUnchecked(o, type.getActualTypeArguments()[0], this.mapper()))
 						.toList();
+			} else if (rawType == Set.class) {
+				return (V) Stream.of((List<?>) json)
+						.map(o -> ConfigUtils.valueUnchecked(o, type.getActualTypeArguments()[0], this.mapper()))
+						.collect(Collectors.toSet());
 			} else {
 				return (V) InvokerUtils.invokeList(null, (List<?>) json);
 			}

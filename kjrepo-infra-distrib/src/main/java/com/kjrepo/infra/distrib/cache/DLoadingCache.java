@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.cache.LoadingCache;
 import com.kjrepo.infra.common.logger.LoggerUtils;
+import com.kjrepo.infra.common.utils.StackUtils;
 import com.kjrepo.infra.common.utils.ProxyUtils;
 import com.kjrepo.infra.register.Register;
 import com.kjrepo.infra.register.context.RegisterFactory;
@@ -21,13 +22,7 @@ public interface DLoadingCache<K, V> extends LoadingCache<K, V> {
 				return method.invoke(cache, args);
 			});
 		}
-		StackTraceElement element = Thread.currentThread().getStackTrace()[2];
-		if (!"<clinit>".equals(element.getMethodName()) && !"<init>".equals(element.getMethodName())) {
-			LoggerUtils.logger(DLoadingCache.class).error(
-					"please invoke this method in <clinit> or <init> method!!! location:{}.{}:{}",
-					element.getClassName(), element.getMethodName(), element.getLineNumber());
-		}
-		Register<Long> register = RegisterFactory.getContext(element.getClassName()).getRegister(Long.class);
+		Register<Long> register = RegisterFactory.getContext(StackUtils.firstBusinessInvokerClassname()).getRegister(Long.class);
 		register.addListener(key, e -> {
 			cache.invalidateAll();
 		});

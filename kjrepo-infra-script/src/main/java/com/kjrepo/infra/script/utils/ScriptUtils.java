@@ -11,7 +11,7 @@ import com.kjrepo.infra.common.logger.LoggerUtils;
 
 public class ScriptUtils {
 
-	private static final Logger logger = LoggerUtils.logger();
+	private static final Logger logger = LoggerUtils.logger(ScriptUtils.class);
 	private static final ScriptEngineManager MANAGER = new ScriptEngineManager();
 
 	static {

@@ -9,7 +9,7 @@ import com.kjrepo.infra.common.logger.LoggerUtils;
 
 public abstract class Mail<S extends Service> extends PooledInfoExecutor<MailSessionHolder<S>, MailInfo<S>> {
 
-	protected final Logger logger = LoggerUtils.logger();
+	protected final Logger logger = LoggerUtils.logger(getClass());
 
 	public Mail(MailInfo<S> info) {
 		super(info);

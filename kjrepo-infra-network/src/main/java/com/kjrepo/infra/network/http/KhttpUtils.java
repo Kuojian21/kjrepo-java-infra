@@ -33,7 +33,7 @@ import com.kjrepo.infra.trace.client.TraceHttpResponseInterceptor;
 
 public class KhttpUtils {
 
-	private static final Logger logger = LoggerUtils.logger();
+	private static final Logger logger = LoggerUtils.logger(KhttpUtils.class);
 
 	public static CloseableHttpClient client(KhttpClientInfo info) {
 		PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager();

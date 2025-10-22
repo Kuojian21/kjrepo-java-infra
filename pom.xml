@@ -23,6 +23,7 @@
 		<module>kjrepo-infra-thread</module>
 		<module>kjrepo-infra-register</module>
 		<module>kjrepo-infra-cluster</module>
+		<module>kjrepo-infra-gcode</module>
 	</modules>
 
 	<properties>

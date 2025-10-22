@@ -18,7 +18,7 @@ import com.kjrepo.infra.text.json.JsonUtils;
 
 public class ElasticsearchUtils {
 
-	private static final Logger LOGGER = LoggerUtils.logger();
+	private static final Logger LOGGER = LoggerUtils.logger(ElasticsearchUtils.class);
 
 	public static RestClient client(ElasticsearchInfo info, FailureListener failureListener) {
 		info.getHttpClientConfig().getThreadFactoryConfig().putIfAbsent("daemon", true);

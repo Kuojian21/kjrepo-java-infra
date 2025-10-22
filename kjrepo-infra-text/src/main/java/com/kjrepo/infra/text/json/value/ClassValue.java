@@ -4,11 +4,13 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.kjrepo.infra.text.json.ConfigUtils;
 import com.kjrepo.infra.text.json.JsonUtils;
 import com.kjrepo.infra.text.json.utils.InvokerUtils;
@@ -28,6 +30,8 @@ public class ClassValue implements Value<Class<?>> {
 						.toArray(i -> (Object[]) Array.newInstance(objClass.getComponentType(), i));
 			} else if (objClass == List.class) {
 				return (V) Lists.newArrayList((List<?>) json);
+			} else if (objClass == Set.class) {
+				return (V) Sets.newHashSet((List<?>) json);
 			} else if (List.class.isAssignableFrom(objClass)) {
 				Type[] aTypes = List.class.getTypeParameters();
 				Map<Type, Type> mType = TypeMapperUtils.mapper(objClass).get(List.class);

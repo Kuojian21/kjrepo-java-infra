@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 
 import com.annimon.stream.Stream;
-import com.kjrepo.infra.common.utils.HumanUtils;
+import com.kjrepo.infra.common.number.N_humanUtils;
 
 public class OperatingSystemIReporterBean extends AbstractIReporterBean<OperatingSystemMXBean> {
 
@@ -26,26 +26,26 @@ public class OperatingSystemIReporterBean extends AbstractIReporterBean<Operatin
 			case "systemLoadAverage":
 				return data().getSystemLoadAverage() + "";
 			case "committedVirtualMemorySize":
-				return "" + HumanUtils.formatByte(
+				return "" + N_humanUtils.formatByte(
 						((com.sun.management.OperatingSystemMXBean) data()).getCommittedVirtualMemorySize());
 			case "totalMemorySize":
-				return "" + HumanUtils
+				return "" + N_humanUtils
 						.formatByte(((com.sun.management.OperatingSystemMXBean) data()).getTotalMemorySize());
 			case "freeMemorySize":
-				return "" + HumanUtils
+				return "" + N_humanUtils
 						.formatByte(((com.sun.management.OperatingSystemMXBean) data()).getFreeMemorySize());
 			case "totalSwapSpaceSize":
-				return "" + HumanUtils
+				return "" + N_humanUtils
 						.formatByte(((com.sun.management.OperatingSystemMXBean) data()).getTotalSwapSpaceSize());
 			case "freeSwapSpaceSize":
-				return "" + HumanUtils
+				return "" + N_humanUtils
 						.formatByte(((com.sun.management.OperatingSystemMXBean) data()).getFreeSwapSpaceSize());
 			case "cpuLoad":
 				return "" + ((com.sun.management.OperatingSystemMXBean) data()).getCpuLoad();
 			case "processCpuLoad":
 				return "" + ((com.sun.management.OperatingSystemMXBean) data()).getProcessCpuLoad();
 			case "processCpuTime":
-				return "" + HumanUtils
+				return "" + N_humanUtils
 						.formatNanos(((com.sun.management.OperatingSystemMXBean) data()).getProcessCpuTime());
 			default:
 				return "";

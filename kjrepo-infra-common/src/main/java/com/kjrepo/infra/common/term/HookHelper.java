@@ -17,23 +17,14 @@ import com.kjrepo.infra.common.logger.LoggerUtils;
 
 public class HookHelper {
 
-	private static final Logger logger = LoggerUtils.logger();
+	private static final Logger logger = LoggerUtils.logger(HookHelper.class);
 	private static final Map<String, LazySupplier<List<Hook>>> hooks = Maps.newConcurrentMap();
 
 	public static void addHook(String module, ThrowableRunnable<? extends Throwable> hook) {
-		addHook(module, hook, true);
-	}
-
-	public static void addHook(String module, ThrowableRunnable<? extends Throwable> hook, boolean direct) {
-		StackTraceElement[] elements = (StackTraceElement[]) Stream.of(Thread.currentThread().getStackTrace())
-				.filterIndexed((i, e) -> i >= 2).toArray(i -> new StackTraceElement[i]);
-		StackTraceElement element = elements[0];
-		if (direct) {
-
-		} else {
-			element = Stream.of(elements).filter(e -> !elements[0].getFileName().equals(e.getFileName())).findFirst()
-					.get();
-		}
+		StackTraceElement element = Stream.of(Thread.currentThread().getStackTrace())
+				.filter(e -> !e.getClassName().equals("java.lang.Thread")
+						&& !HookHelper.class.getName().equals(e.getClassName()))
+				.findFirst().get();
 		hooks.computeIfAbsent(Optional.ofNullable(module).orElse("def"), k -> LazySupplier.wrap(() -> {
 			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 				@Override

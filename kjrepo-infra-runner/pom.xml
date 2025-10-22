@@ -29,6 +29,10 @@
 			<groupId>kjrepo-infra</groupId>
 			<artifactId>kjrepo-infra-cluster</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>kjrepo-infra</groupId>
+			<artifactId>kjrepo-infra-distrib</artifactId>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
 		<dependency>

@@ -2,7 +2,7 @@ package com.kjrepo.infra.monitor.mx.reporter;
 
 import java.lang.management.RuntimeMXBean;
 
-import com.kjrepo.infra.common.utils.HumanUtils;
+import com.kjrepo.infra.common.number.N_humanUtils;
 
 public class RuntimeIReporter extends AbstractIReporter<RuntimeIReporterBean> {
 
@@ -10,7 +10,7 @@ public class RuntimeIReporter extends AbstractIReporter<RuntimeIReporterBean> {
 	public void report(RuntimeIReporterBean data) {
 		RuntimeMXBean bean = data.data();
 		logger.info("runtime pid:{} name:{} uptime:{}", bean.getPid(), bean.getName(),
-				HumanUtils.formatMills(bean.getUptime()));
+				N_humanUtils.formatMills(bean.getUptime()));
 	}
 
 }

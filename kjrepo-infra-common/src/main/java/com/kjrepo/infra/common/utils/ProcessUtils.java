@@ -15,7 +15,7 @@ import com.kjrepo.infra.common.logger.LoggerUtils;
 
 public class ProcessUtils {
 
-	private static final Logger logger = LoggerUtils.logger();
+	private static final Logger logger = LoggerUtils.logger(ProcessUtils.class);
 
 	public static Result exec(Charset charset, String... command) {
 		try {

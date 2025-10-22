@@ -6,20 +6,24 @@ import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Consumer;
 import com.annimon.stream.function.Function;
-import com.annimon.stream.function.Supplier;
 import com.kjrepo.infra.cluster.instance.InstanceInfo;
 import com.kjrepo.infra.cluster.utils.InfoObjectEquals;
 import com.kjrepo.infra.common.lazy.LazySupplier;
+import com.kjrepo.infra.common.utils.StackUtils;
 import com.kjrepo.infra.gregister.GroupRegister;
 import com.kjrepo.infra.gregister.GroupRegisterListener;
+import com.kjrepo.infra.gregister.context.GroupRegisterFactory;
 import com.kjrepo.infra.register.Register;
 import com.kjrepo.infra.register.RegisterEvent;
 import com.kjrepo.infra.register.RegisterListener;
+import com.kjrepo.infra.register.context.RegisterFactory;
 
 public class ClusterFactory {
 
-	public static <R, I, C extends ClusterInfo<I>> Supplier<Cluster<R>> gcluster(Class<R> rclazz,
-			GroupRegister<C, I> gregister, String key, Function<InstanceInfo<I>, R> mapper, Consumer<R> release) {
+	public static <R, I, C extends ClusterInfo<I>> LazySupplier<Cluster<R>> gcluster(Class<R> rclazz, Class<C> cclazz,
+			Class<I> iclazz, String key, Function<InstanceInfo<I>, R> mapper, Consumer<R> release) {
+		GroupRegister<C, I> gregister = GroupRegisterFactory.getContext(StackUtils.firstBusinessInvokerClassname())
+				.getGroupRegister(cclazz, iclazz);
 		LazySupplier<ClusterInfo<?>> info = LazySupplier.wrap(() -> {
 			ClusterInfo<I> cinfo = gregister.get(key);
 			cinfo.setInstanceInfos(
@@ -61,9 +65,9 @@ public class ClusterFactory {
 		return cluster;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public static <R, I, C extends ClusterInfo> Supplier<Cluster<R>> cluster(Class<R> rclazz, Register<C> register,
+	public static <R, I, C extends ClusterInfo<I>> LazySupplier<Cluster<R>> cluster(Class<R> rclazz, Class<C> cclazz,
 			String key, Function<InstanceInfo<I>, R> mapper, Consumer<R> release) {
+		Register<C> register = RegisterFactory.getContext(StackUtils.firstBusinessInvokerClassname()).getRegister(cclazz);
 		LazySupplier<ClusterInfo<?>> info = LazySupplier.wrap(() -> register.get(key));
 		LazySupplier<Cluster<R>> cluster = LazySupplier.wrap(() -> new Cluster<R>(rclazz, info, mapper, release));
 		register.addListener(key, new RegisterListener<>() {

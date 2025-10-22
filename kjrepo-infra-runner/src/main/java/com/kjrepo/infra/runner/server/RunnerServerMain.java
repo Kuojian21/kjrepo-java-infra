@@ -13,7 +13,7 @@ import com.kjrepo.infra.runner.server.args.Args;
 
 public class RunnerServerMain {
 
-	private static final Logger logger = LoggerUtils.logger();
+	private static final Logger logger = LoggerUtils.logger(RunnerServerMain.class);
 
 	public static <R extends Runner> void main(String[] args) {
 		try {

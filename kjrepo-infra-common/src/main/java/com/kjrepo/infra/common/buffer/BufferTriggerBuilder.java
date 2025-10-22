@@ -20,7 +20,7 @@ import com.kjrepo.infra.common.logger.LoggerUtils;
 
 public class BufferTriggerBuilder<E, C> {
 
-	private static final Logger logger = LoggerUtils.logger();
+	private static final Logger logger = LoggerUtils.logger(BufferTriggerBuilder.class);
 
 	private Supplier<C> containerFactory;
 	private ToIntBiFunction<C, E> containerEnqueue;

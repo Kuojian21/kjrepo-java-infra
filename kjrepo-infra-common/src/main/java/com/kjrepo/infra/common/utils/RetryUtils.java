@@ -14,7 +14,7 @@ public class RetryUtils {
 
 	private static final ThreadLocal<String> msg = new ThreadLocal<>();
 
-	private static final Logger logger = LoggerUtils.logger();
+	private static final Logger logger = LoggerUtils.logger(RetryUtils.class);
 
 	public static <X extends Throwable> void run(ThrowableRunnable<X> runnable, int times, long sleep) {
 		run(runnable, times, sleep, e -> true);

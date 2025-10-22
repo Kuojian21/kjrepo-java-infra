@@ -24,7 +24,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 public class Netty {
 
-	private static final Logger logger = LoggerUtils.logger();
+	private static final Logger logger = LoggerUtils.logger(Netty.class);
 
 	public static Channel server(int port, ChannelInitializer<SocketChannel> initializer) {
 		return server(port, initializer, null, null);

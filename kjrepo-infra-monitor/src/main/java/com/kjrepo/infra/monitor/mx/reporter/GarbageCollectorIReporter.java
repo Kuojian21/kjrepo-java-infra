@@ -6,7 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 
 import com.kjrepo.infra.common.logger.LoggerUtils;
-import com.kjrepo.infra.common.utils.HumanUtils;
+import com.kjrepo.infra.common.number.N_humanUtils;
 
 public class GarbageCollectorIReporter extends AbstractIReporter<GarbageCollectorIReporterBean> {
 
@@ -17,7 +17,7 @@ public class GarbageCollectorIReporter extends AbstractIReporter<GarbageCollecto
 		List<GarbageCollectorMXBean> beans = data.data();
 		beans.forEach(bean -> {
 			logger.info("garbage-collector name:{} count:{} time:{}", bean.getName(), bean.getCollectionCount(),
-					HumanUtils.formatMills(bean.getCollectionTime()));
+					N_humanUtils.formatMills(bean.getCollectionTime()));
 		});
 	}
 

@@ -38,7 +38,7 @@ public abstract class PooledInfoExecutor<T, I extends PooledInfo<T>> extends Inf
 				}
 
 			}, info.getPoolConfig());
-			HookHelper.addHook("pool-info-executor", () -> close(), false);
+			HookHelper.addHook("pool-info-executor", () -> close());
 		}
 	}
 

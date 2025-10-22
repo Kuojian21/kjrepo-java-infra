@@ -43,5 +43,21 @@ class Hikari {
 		config.setMaxLifetime(0L);
 		config.setRegisterMbeans(false);
 	}
+	
+	public static HikariConfig defaultHikariConfig() {
+		HikariConfig config = new HikariConfig();
+		config.addDataSourceProperty("cachePrepStmts", "true");
+		config.addDataSourceProperty("prepStmtCacheSize", "250");
+		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+		config.setAutoCommit(true);
+		config.setConnectionTimeout(TimeUnit.SECONDS.toMillis(20L));
+		config.setValidationTimeout(TimeUnit.SECONDS.toMillis(5L));
+		config.setIdleTimeout(TimeUnit.MINUTES.toMillis(1L));
+		config.setMaximumPoolSize(100);
+		config.setMinimumIdle(0);
+		config.setMaxLifetime(0L);
+		config.setRegisterMbeans(false);
+		return config;
+	}
 
 }

@@ -64,7 +64,7 @@ public class FileMonitor {
 	public void start() {
 		try {
 			monitor.start();
-			HookHelper.addHook("file-monitor", () -> stop(), false);
+			HookHelper.addHook("file-monitor", () -> stop());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

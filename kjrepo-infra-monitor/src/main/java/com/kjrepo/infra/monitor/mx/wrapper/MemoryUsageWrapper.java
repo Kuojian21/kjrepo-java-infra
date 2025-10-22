@@ -7,7 +7,7 @@ import java.math.RoundingMode;
 import org.apache.commons.text.StringSubstitutor;
 
 import com.annimon.stream.Optional;
-import com.kjrepo.infra.common.utils.HumanUtils;
+import com.kjrepo.infra.common.number.N_humanUtils;
 
 public class MemoryUsageWrapper {
 
@@ -27,19 +27,19 @@ public class MemoryUsageWrapper {
 	}
 
 	public String used() {
-		return HumanUtils.formatByte(usage.getUsed());
+		return N_humanUtils.formatByte(usage.getUsed());
 	}
 
 	public String committed() {
-		return HumanUtils.formatByte(usage.getCommitted());
+		return N_humanUtils.formatByte(usage.getCommitted());
 	}
 
 	public String init() {
-		return HumanUtils.formatByte(usage.getInit());
+		return N_humanUtils.formatByte(usage.getInit());
 	}
 
 	public String max() {
-		return HumanUtils.formatByte(usage.getMax());
+		return N_humanUtils.formatByte(usage.getMax());
 	}
 
 	public double rate() {

@@ -8,6 +8,11 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>kjrepo-infra-storage</artifactId>
+
+	<properties>
+		<lucene.version>9.12.3</lucene.version>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>kjrepo-infra</groupId>
@@ -122,6 +127,30 @@
 			<artifactId>hadoop-hdfs</artifactId>
 			<version>3.4.1</version>
 			<scope>provided</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-core -->
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-core</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
+		<!--
+		https://mvnrepository.com/artifact/org.apache.lucene/lucene-analysis-common -->
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-analysis-common</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-queryparser</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.github.magese/ik-analyzer -->
+		<dependency>
+			<groupId>com.github.magese</groupId>
+			<artifactId>ik-analyzer</artifactId>
+			<version>8.5.0</version>
 		</dependency>
 
 	</dependencies>

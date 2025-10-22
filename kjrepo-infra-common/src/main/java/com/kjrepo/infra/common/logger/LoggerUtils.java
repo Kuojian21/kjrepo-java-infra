@@ -8,17 +8,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import com.annimon.stream.Stream;
+import com.kjrepo.infra.common.utils.StackUtils;
 
 public class LoggerUtils {
 
 	public static Logger logger() {
-		StackTraceElement element = Thread.currentThread().getStackTrace()[2];
-		if (!"<clinit>".equals(element.getMethodName()) && !"<init>".equals(element.getMethodName())) {
-			factory.getLogger(LoggerUtils.class).error(
-					"please invoke this method in <clinit> or <init> method!!! location:{}.{}:{}",
-					element.getClassName(), element.getMethodName(), element.getLineNumber());
-		}
-		return factory.getLogger(element.getClassName());
+		return factory.getLogger(StackUtils.firstBusinessInvokerClassname());
 	}
 
 	public static Logger logger(Class<?> clazz) {

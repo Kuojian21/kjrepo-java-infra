@@ -24,7 +24,7 @@ public class Monitor {
 				return TimeUnit.MINUTES.toMillis(1);
 			}
 
-			public String ID() {
+			public String module() {
 				return "monitor";
 			}
 		}.execute();

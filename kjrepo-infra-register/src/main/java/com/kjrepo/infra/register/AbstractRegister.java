@@ -69,9 +69,11 @@ public abstract class AbstractRegister<V> implements Register<V> {
 	}
 
 	protected String defString() {
-		if (this.clazz.isPrimitive() || Number.class.isAssignableFrom(this.clazz) || this.clazz == String.class) {
+		if (this.clazz.isPrimitive() || Number.class.isAssignableFrom(this.clazz) || this.clazz == Character.class
+				|| this.clazz == Boolean.class || this.clazz == String.class) {
 			return "";
-		} else if (this.clazz.isArray() || List.class.isAssignableFrom(this.clazz)) {
+		} else if (this.clazz.isArray() || List.class.isAssignableFrom(this.clazz)
+				|| Set.class.isAssignableFrom(this.clazz)) {
 			return "[]";
 		}
 		return "{}";

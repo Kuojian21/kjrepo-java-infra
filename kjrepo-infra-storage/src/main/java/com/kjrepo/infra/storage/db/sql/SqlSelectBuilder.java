@@ -5,44 +5,48 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.annimon.stream.Optional;
+import com.annimon.stream.Stream;
 import com.google.common.collect.Maps;
-import com.kjrepo.infra.storage.db.model.Model;
+import com.kjrepo.infra.storage.db.model.KdbModel;
+import com.kjrepo.infra.storage.db.model.KdbProperty;
 
 public class SqlSelectBuilder extends SqlBuilder {
 
+	private final String sql;
 	private SqlWhereBuilder sqlWhereBuilder;
 
-	public SqlSelectBuilder(Model model, String table) {
-		super(model);
-		super.sql.append("select * from ").append(table);
+	public SqlSelectBuilder(KdbModel kdbModel, String table) {
+		super(kdbModel);
+		this.sql = new StringBuilder().append("select * from ").append(table).toString();
 	}
 
-	public SqlSelectBuilder(Model model, String table, List<String> columns) {
-		super(model);
-		super.sql.append("select ").append(StringUtils.join(columns, ",")).append(" from ").append(table);
+	public SqlSelectBuilder(KdbModel kdbModel, String table, List<String> columns) {
+		super(kdbModel);
+		this.sql = new StringBuilder().append("select ")
+				.append(StringUtils.join(Stream.of(columns)
+						.map(c -> Optional.ofNullable(kdbModel.getProperty(c)).map(KdbProperty::column).orElse(c))
+						.toList(), ","))
+				.append(" from ").append(table).toString();
 	}
 
 	public SqlSelectBuilder where(SqlWhereBuilder sqlWhereBuilder) {
 		this.sqlWhereBuilder = sqlWhereBuilder;
+		this.sqlWhereBuilder.model(model());
 		return this;
 	}
 
 	@Override
 	public String sql() {
-		StringBuilder builder = new StringBuilder();
-		builder.append(super.sql);
-		if (sqlWhereBuilder != null && sqlWhereBuilder.sql().length() > 0) {
-			builder.append(" where ").append(sqlWhereBuilder.sql());
-		}
-		return builder.toString();
+		return new StringBuilder().append(this.sql).append(Optional.ofNullable(this.sqlWhereBuilder)
+				.map(SqlWhereBuilder::sql).filter(StringUtils::isNotEmpty).map(w -> " where " + w).orElse(""))
+				.toString();
 	}
 
 	@Override
 	public Map<String, Object> valueMap() {
-		Map<String, Object> map = Maps.newHashMap();
-		map.putAll(super.valueMap);
-		map.putAll(sqlWhereBuilder.valueMap());
-		return map;
+		return Optional.ofNullable(this.sqlWhereBuilder).map(SqlWhereBuilder::valueMap).orElseGet(Maps::newHashMap);
+
 	}
 
 }

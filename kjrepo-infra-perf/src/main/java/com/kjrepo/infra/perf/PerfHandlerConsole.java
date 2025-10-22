@@ -14,7 +14,7 @@ import com.kjrepo.infra.common.logger.LoggerUtils;
 
 public class PerfHandlerConsole implements PerfHandler {
 
-	private static final Logger logger = LoggerUtils.logger();
+	private static final Logger logger = LoggerUtils.logger(PerfHandler.class);
 
 	private String header = format(Lists.newArrayList("name", "micro", "count", "maxMicro", "minMicro", "avg",
 			"variance", "top-95", "top-99"));

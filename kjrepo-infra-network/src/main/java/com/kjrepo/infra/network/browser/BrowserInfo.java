@@ -16,7 +16,7 @@ import com.kjrepo.infra.common.logger.LoggerUtils;
 
 public class BrowserInfo extends PooledInfoDefault<WebClient> {
 
-	private static Logger logger = LoggerUtils.logger();
+	private static Logger logger = LoggerUtils.logger(BrowserInfo.class);
 	private static Map<String, BrowserVersion> browsers = Stream.of(BrowserVersion.ALL_SUPPORTED_BROWSERS)
 			.collect(Collectors.toMap(br -> br.getNickname().toLowerCase(), br -> br));
 	static {

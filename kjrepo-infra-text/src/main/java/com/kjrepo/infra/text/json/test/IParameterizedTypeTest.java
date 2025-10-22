@@ -6,7 +6,7 @@ import com.kjrepo.infra.common.logger.LoggerUtils;
 
 abstract class IParameterizedTypeTest<T> {
 
-	Logger logger = LoggerUtils.logger();
+	Logger logger = LoggerUtils.logger(getClass());
 
 	public void test1(T bean) {
 		logger.info("{}", bean);

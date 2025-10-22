@@ -10,7 +10,7 @@ import com.kjrepo.infra.common.logger.LoggerUtils;
 
 class ParameterizedTypeTest extends IParameterizedTypeTest<String> {
 
-	public static final Logger logger = LoggerUtils.logger();
+	public static final Logger logger = LoggerUtils.logger(ParameterizedTypeTest.class);
 
 	public void test1(String bean) {
 		logger.info("{}", bean);

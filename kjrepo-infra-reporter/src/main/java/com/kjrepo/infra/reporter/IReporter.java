@@ -7,7 +7,7 @@ import com.kjrepo.infra.reporter.bean.IReporterBean;
 
 public interface IReporter<D extends IReporterBean> {
 
-	Logger logger = LoggerUtils.logger();
+	Logger logger = LoggerUtils.logger(IReporter.class);
 
 	void report(D bean);
 
