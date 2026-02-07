@@ -41,9 +41,13 @@ public class Instance<R> implements Supplier<R>, Closeable {
 		this.resource = resource;
 		this.pool = null;
 		this.instance = LazySupplier.wrap(() -> {
-			return ProxyUtils.proxy(this.clazz, (obj, method, args, proxy) -> {
-				return method.invoke(this.resource, args);
-			});
+			if (this.clazz.isInterface()) {
+				return ProxyUtils.proxy(this.clazz, (obj, method, args, proxy) -> {
+					return method.invoke(this.resource, args);
+				});
+			} else {
+				return this.resource;
+			}
 		});
 		this.release = release;
 	}

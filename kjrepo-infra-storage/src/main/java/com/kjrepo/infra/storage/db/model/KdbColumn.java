@@ -29,4 +29,8 @@ public @interface KdbColumn {
 
 	String definition() default "";
 
+	boolean defInsert() default false;
+
+	boolean defUpdate() default false;
+
 }

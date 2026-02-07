@@ -14,8 +14,8 @@ public class KjdbcClusterRepository<T, K> {
 		this.cluster = cluster;
 	}
 
-	public KjdbcCluster<T, K> cluster(Class<T> clazz) {
-		return new KjdbcClusterImpl<T, K>(clazz) {
+	public KjdbcCluster<T> cluster(Class<T> clazz) {
+		return new KjdbcClusterImpl<T>(clazz) {
 			@Override
 			public Cluster<NamedParameterJdbcOperations> cluster() {
 				return cluster;

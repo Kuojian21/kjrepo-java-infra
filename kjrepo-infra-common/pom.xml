@@ -41,6 +41,12 @@
 			<artifactId>commons-pool2</artifactId>
 			<version>2.12.1</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.20.0</version>
+		</dependency>
 		<!--
 		https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
 		<dependency>
@@ -85,7 +91,7 @@
 		<dependency>
 			<groupId>com.github.phantomthief</groupId>
 			<artifactId>more-lambdas</artifactId>
-			<version>0.1.49</version>
+			<version>0.1.53</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -93,20 +99,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-		<!-- <version>4.0.0</version> Unable to invoke factory method in class 
-			org.apache.logging.log4j.core.async.AsyncLoggerConfig for element AsyncLogger: 
-			java.lang.UnsupportedClassVersionError: com/lmax/disruptor/EventFactory has 
-			been compiled by a more recent version of the Java Runtime (class file version 
-			55.0), this version of the Java Runtime only recognizes class file versions 
-			up to 52.0 -->
-		<!-- https://mvnrepository.com/artifact/com.lmax/disruptor -->
 		<dependency>
-			<groupId>com.lmax</groupId>
-			<artifactId>disruptor</artifactId>
-			<!--<version>4.0.0</version> -->
-			<version>3.4.4</version>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.11.1</version>
+			<scope>provided</scope>
 		</dependency>
-		
+
 	</dependencies>
 </project>

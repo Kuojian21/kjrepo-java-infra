@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import com.fasterxml.jackson.module.kotlin.KotlinModule;
+//import com.fasterxml.jackson.module.kotlin.KotlinModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.hubspot.jackson.datatype.protobuf.ProtobufModule;
 
@@ -34,13 +34,13 @@ public class JsonUtils {
 	private static final ObjectMapper MAPPER = new ObjectMapper(new JsonFactory() //
 			.disable(INTERN_FIELD_NAMES)) //
 			.disable(FAIL_ON_UNKNOWN_PROPERTIES) //
-			.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+			.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS) //
 			.enable(ALLOW_UNQUOTED_CONTROL_CHARS) //
 			.enable(ALLOW_COMMENTS) //
 			.setSerializationInclusion(JsonInclude.Include.NON_NULL) //
 			.registerModule(new GuavaModule()) //
 			.registerModule(new ParameterNamesModule()) //
-			.registerModule(new KotlinModule()) //
+//			.registerModule(new KotlinModule()) //
 			.registerModule(new ProtobufModule()) //
 			.registerModule(new JacksonXmlModule()); //
 

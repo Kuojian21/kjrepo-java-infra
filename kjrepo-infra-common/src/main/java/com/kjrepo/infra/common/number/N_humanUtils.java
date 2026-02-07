@@ -16,7 +16,15 @@ public class N_humanUtils {
 	}
 
 	public static String formatMills(long mills, int scale) {
-		return format(mills, scale, Base.DE.MILLS.base);
+		return format(mills, scale, Base.DE.MILLI.base);
+	}
+
+	public static String formatMicros(long micros) {
+		return formatMicros(micros, 2);
+	}
+
+	public static String formatMicros(long micros, int scale) {
+		return format(micros, scale, Base.DE.MICRO.base);
 	}
 
 	public static String formatNanos(long nanos) {
@@ -75,8 +83,10 @@ public class N_humanUtils {
 
 		enum DE {
 			THOU(new Base(1000, Lists.newArrayList("", "T", "M", "B"))),
-			BYTE(new Base(1024, Lists.newArrayList("", "K", "M", "G"))),
-			MILLS(new Base(new int[] { 1, 1000, 60, 60, 24 }, Lists.newArrayList("ms", "s", "m", "h", "d"))),
+			BYTE(new Base(1024, Lists.newArrayList("B", "K", "M", "G"))),
+			MILLI(new Base(new int[] { 1, 1000, 60, 60, 24 }, Lists.newArrayList("ms", "s", "m", "h", "d"))),
+			MICRO(new Base(new int[] { 1, 1000, 1000, 60, 60, 24 },
+					Lists.newArrayList("micros", "ms", "s", "m", "h", "d"))),
 			NANO(new Base(new int[] { 1, 1000, 1000, 1000, 60, 60, 24 },
 					Lists.newArrayList("nanos", "micros", "ms", "s", "m", "h", "d")));
 

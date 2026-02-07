@@ -23,14 +23,16 @@
 		<module>kjrepo-infra-thread</module>
 		<module>kjrepo-infra-register</module>
 		<module>kjrepo-infra-cluster</module>
-		<module>kjrepo-infra-gcode</module>
+		<module>kjrepo-infra-code</module>
+		<module>kjrepo-infra-buffer</module>
+		<module>kjrepo-infra-server</module>
+		<module>kjrepo-infra-crawler</module>
 	</modules>
 
 	<properties>
 		<maven-compiler.version>3.10.1</maven-compiler.version>
 		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jackson.version>2.10.3</jackson.version>
 		<spring.version>6.2.7</spring.version>
 	</properties>
 
@@ -114,6 +116,16 @@
 			<dependency>
 				<groupId>kjrepo-infra</groupId>
 				<artifactId>kjrepo-infra-cluster</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>kjrepo-infra</groupId>
+				<artifactId>kjrepo-infra-buffer</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>kjrepo-infra</groupId>
+				<artifactId>kjrepo-infra-server</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 		</dependencies>

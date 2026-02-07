@@ -16,8 +16,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.MultiThreadIoEventLoopGroup;
-import io.netty.channel.nio.NioIoHandler;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -32,8 +31,8 @@ public class Netty {
 
 	public static Channel server(int port, ChannelInitializer<SocketChannel> initializer,
 			Map<ChannelOption<?>, Object> options, Map<ChannelOption<?>, ?> childOptions) {
-		EventLoopGroup bossGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory()); // accept 线程池
-		EventLoopGroup workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
+		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+		EventLoopGroup workerGroup = new NioEventLoopGroup();
 		try {
 			ServerBootstrap bootstrap = new ServerBootstrap();
 			bootstrap.group(bossGroup, workerGroup) //
@@ -70,7 +69,7 @@ public class Netty {
 	public static Channel client(String host, int port, ChannelInitializer<SocketChannel> initializer,
 			Map<ChannelOption<?>, Object> options) {
 		try {
-			EventLoopGroup group = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
+			EventLoopGroup group = new NioEventLoopGroup();
 			Bootstrap bootstrap = new Bootstrap();
 			bootstrap.group(group).channel(NioSocketChannel.class);
 			bootstrap.handler(initializer);

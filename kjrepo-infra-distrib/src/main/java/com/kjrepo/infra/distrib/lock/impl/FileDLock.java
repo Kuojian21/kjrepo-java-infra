@@ -21,7 +21,7 @@ public class FileDLock extends AbstractDLock {
 	private final File file;
 
 	public FileDLock(String key) {
-		this(key, System.getProperty("user.dir") + File.separator + "register");
+		this(key, System.getProperty("user.dir") + File.separator + "dlock");
 	}
 
 	public FileDLock(String key, String workspace) {

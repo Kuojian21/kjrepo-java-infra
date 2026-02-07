@@ -15,10 +15,6 @@
 		</dependency>
 		<dependency>
 			<groupId>kjrepo-infra</groupId>
-			<artifactId>kjrepo-infra-register</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>kjrepo-infra</groupId>
 			<artifactId>kjrepo-infra-trace</artifactId>
 		</dependency>
 	</dependencies>

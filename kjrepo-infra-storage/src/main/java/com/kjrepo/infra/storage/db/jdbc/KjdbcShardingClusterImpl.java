@@ -12,14 +12,14 @@ public abstract class KjdbcShardingClusterImpl<T, K> {
 
 	private final Map<String, Kjdbc<T>> jdbcMap = Maps.newConcurrentMap();
 	private final Class<T> clazz;
-	private final Function<K, String> sharding;
+	private final Function<Long, String> sharding;
 
-	public KjdbcShardingClusterImpl(Class<T> clazz, Function<K, String> sharding) {
+	public KjdbcShardingClusterImpl(Class<T> clazz, Function<Long, String> sharding) {
 		this.clazz = clazz;
 		this.sharding = sharding;
 	}
 
-	public Kjdbc<T> sharding(K key) {
+	public Kjdbc<T> sharding(Long key) {
 		return jdbcMap.computeIfAbsent(this.sharding.apply(key), suffix -> new KjdbcImpl<>(clazz, suffix) {
 			@Override
 			public NamedParameterJdbcOperations jdbcTemplate() {

@@ -1,0 +1,42 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------------------< kjrepo-infra:kjrepo-infra-common >----------------------------------
+[INFO] Building kjrepo-infra-common 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] ------------------------------------------------[ jar ]-------------------------------------------------
+[INFO] 
+[INFO] --- dependency:3.8.1:tree (default-cli) @ kjrepo-infra-common ---
+[INFO] kjrepo-infra:kjrepo-infra-common:jar:0.0.1-SNAPSHOT
+[INFO] +- com.google.guava:guava:jar:33.4.8-jre:compile
+[INFO] |  +- com.google.guava:failureaccess:jar:1.0.3:compile
+[INFO] |  +- com.google.guava:listenablefuture:jar:9999.0-empty-to-avoid-conflict-with-guava:compile
+[INFO] |  +- org.jspecify:jspecify:jar:1.0.0:compile
+[INFO] |  +- com.google.errorprone:error_prone_annotations:jar:2.36.0:compile
+[INFO] |  \- com.google.j2objc:j2objc-annotations:jar:3.0.0:compile
+[INFO] +- cglib:cglib:jar:3.3.0:compile
+[INFO] |  \- org.ow2.asm:asm:jar:7.1:compile
+[INFO] +- com.annimon:stream:jar:1.2.1:compile
+[INFO] +- commons-io:commons-io:jar:2.18.0:compile
+[INFO] +- org.apache.commons:commons-pool2:jar:2.12.1:compile
+[INFO] +- org.apache.commons:commons-collections4:jar:4.4:compile
+[INFO] +- org.apache.commons:commons-text:jar:1.12.0:compile
+[INFO] |  \- org.apache.commons:commons-lang3:jar:3.14.0:compile
+[INFO] +- ch.qos.logback:logback-classic:jar:1.5.18:compile
+[INFO] |  \- ch.qos.logback:logback-core:jar:1.5.18:compile
+[INFO] +- org.slf4j:slf4j-api:jar:2.0.17:compile
+[INFO] +- org.springframework:spring-context:jar:6.2.7:compile
+[INFO] |  +- org.springframework:spring-beans:jar:6.2.7:compile
+[INFO] |  +- org.springframework:spring-core:jar:6.2.7:compile
+[INFO] |  |  \- org.springframework:spring-jcl:jar:6.2.7:compile
+[INFO] |  +- org.springframework:spring-expression:jar:6.2.7:compile
+[INFO] |  \- io.micrometer:micrometer-observation:jar:1.14.7:compile
+[INFO] |     \- io.micrometer:micrometer-commons:jar:1.14.7:compile
+[INFO] +- org.springframework:spring-aop:jar:6.2.7:compile
+[INFO] \- com.github.phantomthief:more-lambdas:jar:0.1.53:compile
+[INFO]    \- com.google.code.findbugs:jsr305:jar:1.3.9:compile
+[INFO] --------------------------------------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] --------------------------------------------------------------------------------------------------------
+[INFO] Total time:  1.914 s
+[INFO] Finished at: 2025-11-01T08:59:37+08:00
+[INFO] --------------------------------------------------------------------------------------------------------

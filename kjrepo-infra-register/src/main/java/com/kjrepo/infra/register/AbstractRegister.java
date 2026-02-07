@@ -14,7 +14,7 @@ import com.kjrepo.infra.text.json.ConfigUtils;
 
 public abstract class AbstractRegister<V> implements Register<V> {
 
-	protected final Logger logger = LoggerUtils.logger(this.getClass());
+	protected final Logger logger = LoggerUtils.logger(Register.class);
 
 	private final ConcurrentMap<String, LazySupplier<LazySupplier<V>>> datas = Maps.newConcurrentMap();
 	private final ConcurrentMap<String, Set<RegisterListener<V>>> listeners = Maps.newConcurrentMap();
@@ -38,7 +38,7 @@ public abstract class AbstractRegister<V> implements Register<V> {
 	@Override
 	public void addListener(String key, RegisterListener<V> listener) {
 		listeners.computeIfAbsent(key, k -> Sets.newConcurrentHashSet()).add(listener);
-		logger.info("add listener for {} ", key);
+		logger.info("add listener for [{}]!!!", key);
 	}
 
 	protected void refresh(String key) {
@@ -55,6 +55,7 @@ public abstract class AbstractRegister<V> implements Register<V> {
 	}
 
 	protected void fireListener(RegisterEvent<V> event) {
+		logger.info("fireChange key:[{}]!!!", event.getKey());
 		if (event.getOldData() == event.getNewData()) {
 
 		} else if (event.getOldData() == null || event.getNewData() == null) {

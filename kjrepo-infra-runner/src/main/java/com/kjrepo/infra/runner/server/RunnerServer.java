@@ -1,17 +1,19 @@
 package com.kjrepo.infra.runner.server;
 
-import java.util.List;
+//import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 
-import com.google.common.collect.Lists;
+//import com.google.common.collect.Lists;
 import com.kjrepo.infra.common.lazy.LazySupplier;
 import com.kjrepo.infra.runner.Runner;
 
 public interface RunnerServer<R extends Runner> {
 
-	RunnerServer<R> run(List<R> runners);
+//	RunnerServer<R> run(List<R> runners);
+
+	RunnerServer<R> run(R runner);
 
 	RunnerServer<R> init();
 
@@ -26,8 +28,8 @@ public interface RunnerServer<R extends Runner> {
 		return options;
 	}
 
-	default RunnerServer<R> run(R runner) {
-		return this.run(Lists.newArrayList(runner));
-	}
+//	default RunnerServer<R> run(R runner) {
+//		return this.run(Lists.newArrayList(runner));
+//	}
 
 }

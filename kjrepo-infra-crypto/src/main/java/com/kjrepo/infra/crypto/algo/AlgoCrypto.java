@@ -35,7 +35,7 @@ public enum AlgoCrypto {
 		this.mode = mode;
 		this.padding = padding;
 		this.keysize = keysize;
-		this.transformation = this.algorithm + "-" + this.mode + "-" + this.padding;
+		this.transformation = this.algorithm + "/" + this.mode + "/" + this.padding;
 	}
 
 	public String getAlgorithm() {

@@ -7,7 +7,7 @@ import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 
 import com.annimon.stream.Stream;
 import com.kjrepo.infra.common.file.FileUtils;
-import com.kjrepo.infra.common.info.Pair;
+import com.kjrepo.infra.common.lazy.LazySupplier;
 import com.kjrepo.infra.gregister.AbstractGroupReigster;
 import com.kjrepo.infra.register.Register;
 import com.kjrepo.infra.register.RegisterListener;
@@ -34,22 +34,36 @@ public class FileGroupRegister<V, I> extends AbstractGroupReigster<V, I> {
 		File file = new File(DfileUtils.toFile(this.workspace, path));
 		FileUtils.createDirIfNoExists(file);
 		DfileUtils.monitor(file.getAbsolutePath(), new FileAlterationListenerAdaptor() {
+			/*
+			 * bugfix
+			 */
+//			java.lang.NullPointerException: Cannot invoke "com.kjrepo.infra.cluster.instance.InstanceInfo.getName()" because "tInfo" is null
+//	        		at com.kjrepo.infra.cluster.Cluster.lambda$add$8(Cluster.java:89)
+//	        		at com.kjrepo.infra.common.lazy.LazySupplier.get(LazySupplier.java:32)
+//	        		at com.kjrepo.infra.cluster.selector.RandomSelector.select(RandomSelector.java:19)
+//	        		at com.kjrepo.infra.cluster.Cluster.getResource(Cluster.java:76)
 			@Override
 			public void onDirectoryCreate(final File dir) {
-				fireCreate(path, dir.getName());
+				fireCreate(path, path + "/" + dir.getName());
 			}
 
 			@Override
 			public void onDirectoryDelete(final File dir) {
-				fireRemove(path, dir.getName());
+				fireRemove(path, path + "/" + dir.getName());
 			}
 		});
 	}
 
 	@Override
-	protected List<Pair<String, I>> data(String path) {
+	protected List<CPair<I>> data(String path) {
 		return Stream.of(new File(DfileUtils.toFile(this.workspace, path)).listFiles()).filter(dir -> dir.isDirectory())
-				.map(dir -> dir.getName()).map(ckey -> Pair.pair(ckey, this.get(path, ckey))).toList();
+				.map(dir -> dir.getName()).map(c -> path + "/" + c)
+				.map(ckey -> CPair.of(ckey, LazySupplier.wrap(() -> this.cgetAndInitListener(path, ckey)))).toList();
+	}
+
+	@Override
+	public void cadd(String pkey, I value) {
+		this.cset(pkey + "/" + ProcessHandle.current().pid(), value);
 	}
 
 	@Override

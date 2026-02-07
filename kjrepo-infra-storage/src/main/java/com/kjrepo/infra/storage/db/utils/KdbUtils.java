@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -18,13 +19,11 @@ import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.dialect.MySQLDialect;
-import org.hibernate.dialect.OracleDialect;
-import org.hibernate.dialect.PostgreSQLDialect;
-import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.type.SqlTypes;
 import org.slf4j.Logger;
+import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.sqlite.SQLiteException;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
@@ -33,9 +32,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.kjrepo.infra.common.logger.LoggerUtils;
-import com.kjrepo.infra.storage.db.dialect.H2Dialect;
 import com.kjrepo.infra.storage.db.dialect.SqliteDialect;
 import com.kjrepo.infra.storage.db.model.KdbColumn;
+import com.kjrepo.infra.storage.db.model.KdbDialect;
 import com.kjrepo.infra.storage.db.model.KdbModel;
 import com.kjrepo.infra.storage.db.model.KdbProperty;
 
@@ -51,7 +50,7 @@ public class KdbUtils {
 
 	public static void createTableIfNotExists(DataSource datasource, KdbModel model) {
 		try (Connection conn = datasource.getConnection()) {
-			Dialect dialect = KdbUtils.dialect(conn);
+			KdbDialect dialect = KdbUtils.dialect(conn);
 			DatabaseMetaData meta = conn.getMetaData();
 			try (ResultSet rs = meta.getTables(null, null, model.table().toLowerCase(), new String[] { "TABLE" })) {
 				if (rs.next()) {
@@ -79,17 +78,17 @@ public class KdbUtils {
 		}
 	}
 
-	public static String toCreateTableSql(Class<?> clazz, Dialect dialect) {
+	public static String toCreateTableSql(Class<?> clazz, KdbDialect dialect) {
 		return toCreateTableSql(KdbModel.of(clazz), dialect, true);
 	}
 
-	public static String toCreateTableSql(KdbModel model, Dialect dialect) {
+	public static String toCreateTableSql(KdbModel model, KdbDialect dialect) {
 		return toCreateTableSql(model, dialect, true);
 	}
 
-	public static String toCreateTableSql(KdbModel model, Dialect dialect, boolean ifNotExists) {
+	public static String toCreateTableSql(KdbModel model, KdbDialect dialect, boolean ifNotExists) {
 		StringBuilder sql = new StringBuilder();
-		sql.append(dialect.getCreateTableString());
+		sql.append(dialect.dialect().getCreateTableString());
 		if (ifNotExists && KdbUtils.supportCreateIfNotExists(dialect)) {
 			sql.append(" IF NOT EXISTS");
 		}
@@ -97,24 +96,25 @@ public class KdbUtils {
 		sql.append(StringUtils.join(Stream.of(model.properties()).map(py -> {
 			StringBuilder psql = new StringBuilder();
 			psql.append(py.column()).append(" ");
-			if (py.kdbColumn() != null && StringUtils.isNotEmpty(py.kdbColumn().definition())) {
-				psql.append(py.kdbColumn().definition());
+			if (StringUtils.isNotEmpty(py.definition())) {
+				psql.append(py.definition());
 			} else {
-				psql.append(KdbUtils.columnType(dialect, py.type(), py.kdbColumn()));
-				if (py.kdbColumn() != null && !py.kdbColumn().nullable()) {
+				psql.append(KdbUtils.columnType(dialect.dialect(), py.type(), py.kdbColumn()));
+				if (!py.nullable()) {
 					psql.append(" not null");
 				}
-				if (py.kdbColumn() != null && py.kdbColumn().primary()) {
+				if (py.primary()) {
 					psql.append(" primary key");
 				}
-				if (py.kdbColumn() != null && py.kdbColumn().unique()) {
+				if (py.unique()) {
 					psql.append(" unique");
 				}
-				if (py.kdbColumn() != null && py.kdbColumn().identity()) {
-					psql.append(" " + dialect.getIdentityColumnSupport().getIdentityColumnString(Types.BIGINT));
+				if (py.identity()) {
+					psql.append(
+							" " + dialect.dialect().getIdentityColumnSupport().getIdentityColumnString(Types.BIGINT));
 				}
-				if (py.kdbColumn() != null && StringUtils.isNotEmpty(py.kdbColumn().comment())) {
-					psql.append(" " + dialect.getColumnComment(py.column()));
+				if (StringUtils.isNotEmpty(py.comment())) {
+					psql.append(" " + dialect.dialect().getColumnComment(py.comment()));
 				}
 			}
 			return psql.toString();
@@ -123,11 +123,11 @@ public class KdbUtils {
 		return sql.toString();
 	}
 
-	public static List<String> toCreateIndexSql(Class<?> clazz, Dialect dialect) {
+	public static List<String> toCreateIndexSql(Class<?> clazz, KdbDialect dialect) {
 		return toCreateIndexSql(KdbModel.of(clazz), dialect);
 	}
 
-	public static List<String> toCreateIndexSql(KdbModel model, Dialect dialect) {
+	public static List<String> toCreateIndexSql(KdbModel model, KdbDialect dialect) {
 		if (model.kdbTable() != null && model.kdbTable().indexes() != null && model.kdbTable().indexes().length > 0) {
 			return Stream.of(model.kdbTable().indexes()).map(index -> {
 				StringBuilder sql = new StringBuilder();
@@ -196,7 +196,7 @@ public class KdbUtils {
 		}
 	}
 
-	public static Dialect dialect(DataSource datasource) {
+	public static KdbDialect dialect(DataSource datasource) {
 		try (Connection conn = datasource.getConnection()) {
 			return dialect(conn);
 		} catch (SQLException e) {
@@ -204,34 +204,20 @@ public class KdbUtils {
 		}
 	}
 
-	public static Dialect dialect(Connection conn) {
+	public static KdbDialect dialect(Connection conn) {
 		try {
 			String dname = conn.getMetaData().getDatabaseProductName();
 			String dversion = conn.getMetaData().getDatabaseProductVersion();
 			logger.info("database:{} version:{}", dname, dversion);
-			if (dname.contains("MySQL")) {
-				return new MySQLDialect();
-			} else if (dname.contains("PostgreSQL")) {
-				return new PostgreSQLDialect();
-			} else if (dname.contains("Oracle")) {
-				return new OracleDialect();
-			} else if (dname.contains("SQL Server")) {
-				return new SQLServerDialect();
-			} else if (dname.contains("H2")) {
-				return new H2Dialect();
-			} else if (dname.contains("SQLite")) {
-				return new SqliteDialect();
-			} else {
-				throw new RuntimeException("unknown database!!!");
-			}
+			return KdbDialect.from(dname, dversion);
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public static boolean supportCreateIfNotExists(Dialect dialect) {
-		return dialect instanceof MySQLDialect || dialect instanceof PostgreSQLDialect || dialect instanceof H2Dialect
-				|| dialect instanceof SqliteDialect;
+	public static boolean supportCreateIfNotExists(KdbDialect dialect) {
+		return dialect == KdbDialect.MySQL || dialect == KdbDialect.PostgreSQL || dialect == KdbDialect.H2
+				|| dialect == KdbDialect.Sqlite;
 	}
 
 	public static String columnType(Dialect dialect, Class<?> type, KdbColumn kdbColumn) {
@@ -280,6 +266,18 @@ public class KdbUtils {
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static boolean checkIntegrityConstraint(UncategorizedSQLException e) {
+		Throwable cause = e.getCause();
+		if (cause == null) {
+
+		} else if (cause instanceof SQLIntegrityConstraintViolationException) {
+			return true;
+		} else if (cause instanceof SQLiteException && cause.getMessage().contains("UNIQUE constraint failed")) {
+			return true;
+		}
+		return false;
 	}
 
 	private static <T> T convert(KdbColumn kdbColumn, Function<KdbColumn, T> func, T def) {

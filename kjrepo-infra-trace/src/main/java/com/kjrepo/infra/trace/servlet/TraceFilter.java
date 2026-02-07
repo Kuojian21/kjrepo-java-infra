@@ -9,7 +9,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import com.kjrepo.infra.trace.utils.TraceIDUtils;
+import com.kjrepo.infra.common.trace.TraceIDUtils;
 
 public class TraceFilter implements Filter {
 

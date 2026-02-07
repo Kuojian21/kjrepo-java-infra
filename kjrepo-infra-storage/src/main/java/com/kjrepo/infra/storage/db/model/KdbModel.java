@@ -17,6 +17,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.kjrepo.infra.common.info.Pair;
+import com.kjrepo.infra.common.lazy.LazySupplier;
 
 public class KdbModel {
 
@@ -45,6 +46,14 @@ public class KdbModel {
 
 	public KdbProperty getProperty(String name) {
 		return this.propertyMap.get(name);
+	}
+
+	public List<KdbIndex> uniIndexes() {
+		return uniIndexes.get();
+	}
+
+	public List<KdbProperty> uniProperties() {
+		return uniProperties.get();
 	}
 
 	private static Map<String, PropertyDescriptor> descriptors(Class<?> clazz, Map<String, PropertyDescriptor> map) {
@@ -80,6 +89,8 @@ public class KdbModel {
 	private final KdbTable kdbTable;
 	private final List<KdbProperty> propertyList;
 	private final Map<String, KdbProperty> propertyMap;
+	private final LazySupplier<List<KdbIndex>> uniIndexes;
+	private final LazySupplier<List<KdbProperty>> uniProperties;
 
 	public KdbModel(Class<?> clazz) {
 		this.name = clazz.getSimpleName();
@@ -90,5 +101,19 @@ public class KdbModel {
 		this.propertyMap = Stream.of(this.propertyList)
 				.flatMap(p -> Stream.of(Lists.newArrayList(Pair.pair(p.name(), p), Pair.pair(p.column(), p))))
 				.distinct().collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+		this.uniIndexes = LazySupplier.wrap(() -> {
+			if (kdbTable == null) {
+				return Lists.newArrayList();
+			} else {
+				return Stream.ofNullable(kdbTable.indexes())
+						.filter(i -> i.type() == KdbIndexType.PRIMARY || i.type() == KdbIndexType.UNIQUE)
+						.filter(i -> Stream.of(i.columns()).map(c -> this.getProperty(c)).allMatch(p -> !p.identity()))
+						.toList();
+
+			}
+		});
+		this.uniProperties = LazySupplier.wrap(() -> {
+			return Stream.of(this.properties()).filter(p -> !p.identity() && (p.primary() || p.unique())).toList();
+		});
 	}
 }

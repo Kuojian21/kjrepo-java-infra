@@ -24,15 +24,9 @@ public abstract class Executor<T> {
 		try {
 			this.init(bean);
 			R rtn = handler.apply(bean);
-//			this.after(bean);
 			return rtn;
 		} catch (Throwable t) {
 			e = (E) t;
-//			try {
-//				this.after(bean);
-//			} catch (Exception e1) {
-//				logger.error("", e1);
-//			}
 			throw e;
 		} finally {
 			this.close(bean, e);
@@ -44,10 +38,6 @@ public abstract class Executor<T> {
 	protected void init(T bean) {
 
 	}
-
-//	protected void after(T bean) {
-//
-//	}
 
 	protected <E extends Throwable> void close(T bean, E e) {
 

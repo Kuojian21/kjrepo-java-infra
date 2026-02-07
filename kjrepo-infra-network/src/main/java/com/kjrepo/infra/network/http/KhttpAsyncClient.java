@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -37,8 +36,7 @@ public class KhttpAsyncClient extends LazyInfoExecutor<CloseableHttpAsyncClient,
 		Optional.ofNullable(params).orElseGet(() -> Lists.newArrayList()).forEach(p -> {
 			builder.addParameter(p.getKey(), p.getValue());
 		});
-		Future<HttpResponse> future = call(builder, null, HttpClientContext.create(),
-				new KhttpAsyncClientFutureCallback<>());
+		Future<HttpResponse> future = call(builder, HttpClientContext.create(), new KhttpAsyncClientFutureCallback<>());
 		return MapperFuture.wrap(future, response -> {
 			try {
 				return EntityUtils.toString(response.getEntity());
@@ -49,13 +47,18 @@ public class KhttpAsyncClient extends LazyInfoExecutor<CloseableHttpAsyncClient,
 
 	}
 
-	public final Future<HttpResponse> call(RequestBuilder request, EntityBuilder entity, HttpClientContext context,
+	public final Future<HttpResponse> call(RequestBuilder request) {
+		return call(request, null, new KhttpAsyncClientFutureCallback<>());
+	}
+
+	public final Future<HttpResponse> call(RequestBuilder request, FutureCallback<HttpResponse> callback) {
+		return call(request, null, callback);
+	}
+
+	public final Future<HttpResponse> call(RequestBuilder request, HttpClientContext context,
 			FutureCallback<HttpResponse> callback) {
-		if (entity != null) {
-			request.setEntity(entity.build());
-		}
 		return execute(bean -> {
-			return bean.execute(request.build(), context, callback);
+			return bean.execute(request.build(), context != null ? context : HttpClientContext.create(), callback);
 		});
 	}
 

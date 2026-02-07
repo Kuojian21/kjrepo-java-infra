@@ -4,20 +4,23 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.github.phantomthief.collection.BufferTrigger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.kjrepo.infra.common.buffer.BufferTrigger;
+import com.kjrepo.infra.buffer.trigger.BufferTriggerBuilder;
 
 public class PerfLogger {
 
-	private final BufferTrigger<PerfContext, Map<PerfLogTag, PerfLogMetrics>> bufferTrigger = BufferTrigger
-			.<PerfContext, Map<PerfLogTag, PerfLogMetrics>>builder().setConsumer(this::handle)
+	private final BufferTrigger<PerfContext> bufferTrigger = BufferTriggerBuilder
+			.<PerfContext, Map<PerfLogTag, PerfLogMetrics>>simple() //
+			.consumer(this::handle) //
 			.setContainer(Maps::newConcurrentMap, (container, builder) -> {
 				container.merge(builder.getPerfLog(), new PerfLogMetrics(builder.getCount(), builder.getMicro()),
 						(value1, value2) -> {
 							value1.accept(value2.getCount(), value2.getMicro());
 							return value1;
 						});
+				return true;
 			}).build();
 
 	private final List<PerfHandler> handlers;

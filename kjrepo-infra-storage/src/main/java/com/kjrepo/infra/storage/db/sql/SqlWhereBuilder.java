@@ -3,7 +3,6 @@ package com.kjrepo.infra.storage.db.sql;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -11,26 +10,21 @@ import org.apache.commons.lang3.StringUtils;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.kjrepo.infra.common.lazy.LazySupplier;
-import com.kjrepo.infra.storage.db.model.KdbModel;
 import com.kjrepo.infra.storage.db.model.KdbProperty;
 
-public class SqlWhereBuilder {
+public class SqlWhereBuilder extends SqlBuilder {
 
 	private static final Set<String> SUPPORT_OPTS = Sets.newHashSet(">", ">=", "<", "<=", "=", "!=", "<>", "in",
-			"not in");
+			"not in", "like", "not like", "is null", "is not null");
 
-	private KdbModel kdbModel;
 	private final String logicalOpt;
 	private final List<String> exprs = Lists.newArrayList();
-	private final Map<String, Object> valueMap = Maps.newHashMap();
 	private final List<Runnable> exprsFunc = Lists.newArrayList();
 	private final LazySupplier<String> sql;
 
-	public SqlWhereBuilder(KdbModel kdbModel, String logicalOpt) {
-		this.kdbModel = kdbModel;
+	public SqlWhereBuilder(String logicalOpt) {
 		this.logicalOpt = logicalOpt;
 		this.sql = LazySupplier.wrap(() -> {
 			Stream.of(exprsFunc).forEach(Runnable::run);
@@ -47,7 +41,7 @@ public class SqlWhereBuilder {
 	}
 
 	public static SqlWhereBuilder builder(String logicalOpt) {
-		return new SqlWhereBuilder(null, logicalOpt);
+		return new SqlWhereBuilder(logicalOpt);
 	}
 
 	public SqlWhereBuilder expr(Map<String, Object> params) {
@@ -60,25 +54,41 @@ public class SqlWhereBuilder {
 
 	public SqlWhereBuilder expr(SqlWhereBuilder sqlWhereBuilder) {
 		check();
-		sqlWhereBuilder.model(this.model());
 		this.exprsFunc.add(() -> {
+			sqlWhereBuilder.init(table(), model(), dialect());
 			if (StringUtils.isNotEmpty(sqlWhereBuilder.sql())) {
 				this.exprs.add("(" + sqlWhereBuilder.sql() + ")");
-				this.valueMap.putAll(sqlWhereBuilder.valueMap());
+				this.valueMap().putAll(sqlWhereBuilder.valueMap());
 			}
 		});
 		return this;
 	}
 
+	public SqlWhereBuilder expr(String name, Object value) {
+		return expr(name, "=", value);
+	}
+
 	public SqlWhereBuilder expr(String name, String compareOpt, Object value) {
 		check();
-		final Object vObj = Optional.of(value).map(v -> v.getClass().isArray() ? Lists.newArrayList((Object[]) v) : v)
-				.get();
-		final String opt = Optional
-				.of(StringUtils.join(Stream.of(compareOpt.trim().split("\\s+")).filter(StringUtils::isNotEmpty)
+		final Object vObj = Optional.ofNullable(value)
+				.map(v -> v.getClass().isArray() ? Lists.newArrayList((Object[]) v) : v).orElse(value);
+		final String opt = Optional.of(compareOpt)
+				.map(o -> StringUtils.join(Stream.of(o.trim().split("\\s+")).filter(StringUtils::isNotEmpty)
 						.map(String::trim).filter(StringUtils::isNotEmpty).toList(), " ").toLowerCase())
 				.map(o -> {
-					if (vObj instanceof Collection<?>) {
+					if (vObj == null) {
+						switch (o) {
+						case "=":
+						case "is null":
+							return "is null";
+						case "!=":
+						case "<>":
+						case "is not null":
+							return "is not null";
+						default:
+							throw new RuntimeException("invalid expr:" + name + " " + compareOpt + " " + value);
+						}
+					} else if (vObj instanceof Collection<?>) {
 						switch (o) {
 						case "=":
 							return "in";
@@ -101,16 +111,18 @@ public class SqlWhereBuilder {
 		this.exprsFunc.add(() -> {
 			final KdbProperty kdbProperty = model().getProperty(name);
 			final String column = Optional.ofNullable(kdbProperty).map(KdbProperty::column).orElse(name);
-			if (vObj instanceof Collection<?>) {
+			if (vObj == null) {
+				this.exprs.add(column + " " + opt);
+			} else if (vObj instanceof Collection<?>) {
 				this.exprs.add(column + " " + opt + "(" + StringUtils.join(Stream.of((Collection<?>) vObj).map(v -> {
 					String var = SqlUtils.var();
-					this.valueMap.put(var, Optional.ofNullable(kdbProperty).map(p -> p.cast(v)).orElse(v));
+					this.valueMap().put(var, Optional.ofNullable(kdbProperty).map(p -> p.cast(v)).orElse(v));
 					return ":" + var;
 				}).toList(), ",") + ")");
 			} else {
 				String var = SqlUtils.var();
 				this.exprs.add(column + " " + opt + " :" + var);
-				this.valueMap.put(var, Optional.ofNullable(kdbProperty).map(p -> p.cast(vObj)).orElse(vObj));
+				this.valueMap().put(var, Optional.ofNullable(kdbProperty).map(p -> p.cast(vObj)).orElse(vObj));
 			}
 		});
 		return this;
@@ -126,22 +138,6 @@ public class SqlWhereBuilder {
 
 	public String sql() {
 		return this.sql.get();
-	}
-
-	public Map<String, Object> valueMap() {
-		this.sql.get();
-		return this.valueMap;
-	}
-
-	public void model(KdbModel kdbModel) {
-		if (!Objects.equals(kdbModel, this.kdbModel)) {
-			check();
-		}
-		this.kdbModel = kdbModel;
-	}
-
-	public KdbModel model() {
-		return this.kdbModel;
 	}
 
 	private void check() {

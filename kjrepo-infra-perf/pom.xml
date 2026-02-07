@@ -11,7 +11,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>kjrepo-infra</groupId>
-			<artifactId>kjrepo-infra-common</artifactId>
+			<artifactId>kjrepo-infra-buffer</artifactId>
 		</dependency>
 	</dependencies>
 </project>

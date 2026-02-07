@@ -3,6 +3,7 @@ package com.kjrepo.infra.runner.sch.quatz;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.text.StringSubstitutor;
+import org.apache.commons.text.lookup.StringLookup;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -14,9 +15,9 @@ import com.google.common.base.Stopwatch;
 import com.kjrepo.infra.common.logger.LoggerUtils;
 import com.kjrepo.infra.common.number.N_humanUtils;
 import com.kjrepo.infra.common.term.TermHelper;
+import com.kjrepo.infra.common.trace.TraceIDUtils;
 import com.kjrepo.infra.reporter.utils.Reporter;
 import com.kjrepo.infra.runner.sch.SchElapsedIReporterBean;
-import com.kjrepo.infra.trace.utils.TraceIDUtils;
 
 public class QuatzJob implements Job {
 
@@ -33,7 +34,7 @@ public class QuatzJob implements Job {
 			return;
 		}
 		Stopwatch stopwatch = Stopwatch.createStarted();
-		Supplier<String> supplier = () -> new StringSubstitutor(key -> {
+		Supplier<String> supplier = () -> new StringSubstitutor((StringLookup)key -> {
 			switch (key) {
 			case "group":
 				return job.module();
@@ -49,15 +50,10 @@ public class QuatzJob implements Job {
 				return "";
 			}
 		}).replace("job:${group}.${name} concurrent:${concurrent} class:${clazz} elapsed:${elapsed}");
-//		DLock lock = DLockFactory.getContext(getClass())
-//				.getLock(StringUtils.isEmpty(this.job.ID()) ? null
-//						: "/lock/quatz/" + this.job.ID() + "/"
-//								+ DateFormatUtils.format(context.getScheduledFireTime(), "yyyyMMddHHmmss"));
-//		if (lock.tryLock()) {
 		try {
 			TraceIDUtils.generate();
 			this.job.run();
-			logger.info(supplier.get());
+			logger.debug(supplier.get());
 		} catch (Throwable e) {
 			logger.error(supplier.get(), e);
 		} finally {
@@ -65,5 +61,9 @@ public class QuatzJob implements Job {
 			TraceIDUtils.clear();
 		}
 //		}
+	}
+
+	public QuatzRunner getJob() {
+		return job;
 	}
 }

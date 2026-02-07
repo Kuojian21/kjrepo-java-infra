@@ -1,10 +1,12 @@
 package com.kjrepo.infra.runner.sch.quatz;
 
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
+import org.quartz.utils.ClassUtils;
 
 public class QuatzJobDetail implements JobDetail {
 
@@ -14,10 +16,10 @@ public class QuatzJobDetail implements JobDetail {
 	private static final long serialVersionUID = 1L;
 
 	private final JobDetail jobDetail;
-	private final Job job;
+	private final QuatzJob job;
 	private final Object[] args;
 
-	public QuatzJobDetail(JobDetail jobDetail, Job job, Object[] args) {
+	public QuatzJobDetail(JobDetail jobDetail, QuatzJob job, Object[] args) {
 		this.jobDetail = jobDetail;
 		this.job = job;
 		this.args = args;
@@ -44,8 +46,9 @@ public class QuatzJobDetail implements JobDetail {
 	}
 
 	@Override
-	public boolean isConcurrentExectionDisallowed() {
-		return this.jobDetail.isConcurrentExectionDisallowed();
+	public boolean isConcurrentExecutionDisallowed() {
+		return ClassUtils.isAnnotationPresent(this.job.getJob().getClass(), DisallowConcurrentExecution.class)
+				|| !this.job.getJob().isConcurrentRunning();
 	}
 
 	@Override
@@ -87,7 +90,7 @@ public class QuatzJobDetail implements JobDetail {
 	public String toString() {
 		return "JobDetail '" + this.jobDetail.getKey().getGroup() + "." + this.jobDetail.getKey().getName()
 				+ "':  jobClass: '" + ((getJobClass() == null) ? null : getJobClass().getName())
-				+ " concurrentExectionDisallowed: " + isConcurrentExectionDisallowed()
+				+ " concurrentExectionDisallowed: " + isConcurrentExecutionDisallowed()
 				+ " persistJobDataAfterExecution: " + isPersistJobDataAfterExecution() + " isDurable: " + isDurable()
 				+ " requestsRecovers: " + requestsRecovery();
 	}

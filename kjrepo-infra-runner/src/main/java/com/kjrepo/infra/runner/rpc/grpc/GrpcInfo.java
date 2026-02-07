@@ -1,15 +1,8 @@
 package com.kjrepo.infra.runner.rpc.grpc;
 
-public class GrpcInfo {
+import com.kjrepo.infra.cluster.ClusterInfo;
+import com.kjrepo.infra.runner.rpc.RpcAddressInfo;
 
-	private String selector;
-
-	public String getSelector() {
-		return selector;
-	}
-
-	public void setSelector(String selector) {
-		this.selector = selector;
-	}
+public class GrpcInfo extends ClusterInfo<RpcAddressInfo> {
 
 }

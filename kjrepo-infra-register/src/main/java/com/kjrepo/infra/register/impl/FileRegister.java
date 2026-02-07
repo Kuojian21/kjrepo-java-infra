@@ -30,7 +30,7 @@ public class FileRegister<V> extends AbstractRegister<V> {
 	public void set(String key, V value) {
 		try {
 			File file = new File(DfileUtils.toFile(this.workspace, key) + File.separator + "main.json");
-			FileUtils.createFileIfNoExists(file, "");
+			FileUtils.createFileIfNoExists(file, null);
 			String json = "";
 			if (value == null) {
 			} else {
@@ -45,11 +45,11 @@ public class FileRegister<V> extends AbstractRegister<V> {
 	@Override
 	protected void init(String path) {
 		File file = new File(DfileUtils.toFile(this.workspace, path) + File.separator + "main.json");
-		FileUtils.createFileIfNoExists(file, defString());
+		FileUtils.createFileIfNoExists(file, null);
 		DfileUtils.monitor(file.getParent(), new FileAlterationListenerAdaptor() {
 			@Override
 			public void onFileChange(final File file) {
-				logger.info("file change key:{} file:{}", path, file.getName());
+//				logger.info("file change key:{} file:{}", path, file.getName());
 				refresh(path);
 			}
 		});
@@ -60,6 +60,9 @@ public class FileRegister<V> extends AbstractRegister<V> {
 		try {
 			File file = new File(DfileUtils.toFile(this.workspace, path) + File.separator + "main.json");
 			String json = StringUtils.join(Files.readLines(file, StandardCharsets.UTF_8), "\n").trim();
+			if (StringUtils.isEmpty(json)) {
+				json = defString();
+			}
 			if (json.startsWith("{") && json.endsWith("}") || json.startsWith("[") && json.endsWith("]")) {
 				return JsonUtils.fromJson(json, Object.class);
 			} else {

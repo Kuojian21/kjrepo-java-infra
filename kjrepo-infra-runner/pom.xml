@@ -45,7 +45,7 @@
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
-			<version>2.2.1</version>
+			<version>2.5.0</version>
 		</dependency>
 
 		<!--
@@ -68,11 +68,21 @@
 			<artifactId>grpc-netty</artifactId>
 			<version>1.58.0</version>
 		</dependency>
+		<!-- the version of netty must be same with the grpc's
+			Caused by: io.netty.handler.codec.http2.Http2Exception: Frame length: 1772057 exceeds maximum: 16384
+			io.grpc.StatusRuntimeException: INTERNAL: Encountered end-of-stream mid-frame
+		-->
 		<!-- https://mvnrepository.com/artifact/io.grpc/grpc-protobuf -->
 		<dependency>
 			<groupId>io.grpc</groupId>
 			<artifactId>grpc-protobuf</artifactId>
 			<version>1.58.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.protobuf</groupId>
+					<artifactId>protobuf-java</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/io.grpc/grpc-stub -->
 		<dependency>

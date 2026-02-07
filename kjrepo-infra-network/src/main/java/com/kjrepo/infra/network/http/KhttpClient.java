@@ -5,10 +5,12 @@ import java.util.List;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 
 import com.annimon.stream.Optional;
@@ -25,7 +27,11 @@ public class KhttpClient extends LazyInfoExecutor<CloseableHttpClient, KhttpClie
 		super(info, () -> KhttpUtils.client(info));
 	}
 
-	public String call(String url, String method, List<Pair<String, String>> headers,
+	public final String call(String url, String method) {
+		return call(url, method, null, null);
+	}
+
+	public final String call(String url, String method, List<Pair<String, String>> headers,
 			List<Pair<String, String>> params) {
 		RequestBuilder builder = RequestBuilder
 				.create(Optional.ofNullable(method).orElseGet(() -> HttpPost.METHOD_NAME)).setUri(url);
@@ -38,17 +44,28 @@ public class KhttpClient extends LazyInfoExecutor<CloseableHttpClient, KhttpClie
 		return call(builder, null, HttpClientContext.create(), response -> EntityUtils.toString(response.getEntity()));
 	}
 
+	public final <T> T call(RequestBuilder request, EntityBuilder entity,
+			ThrowableFunction<HttpResponse, T, Exception> rspFunc) {
+		return call(request, entity, null, rspFunc);
+	}
+
 	public final <T> T call(RequestBuilder request, EntityBuilder entity, HttpClientContext context,
-			ThrowableFunction<HttpResponse, T, Exception> responseHandler) {
-		if (entity != null) {
-			request.setEntity(entity.build());
-		}
+			ThrowableFunction<HttpResponse, T, Exception> rspFunc) {
+		return call(entity != null ? request.setEntity(entity.build()).build() : request.build(), context, rspFunc);
+	}
+
+	public final <T> T call(HttpUriRequest request, ThrowableFunction<HttpResponse, T, Exception> rspFunc) {
+		return call(request, null, rspFunc);
+	}
+
+	public final <T> T call(HttpUriRequest request, HttpContext context,
+			ThrowableFunction<HttpResponse, T, Exception> rspFunc) {
 		HttpResponse response = null;
 		try {
 			response = execute(bean -> {
-				return bean.execute(request.build(), context);
+				return bean.execute(request, context != null ? context : HttpClientContext.create());
 			});
-			return responseHandler.apply(response);
+			return rspFunc.apply(response);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {

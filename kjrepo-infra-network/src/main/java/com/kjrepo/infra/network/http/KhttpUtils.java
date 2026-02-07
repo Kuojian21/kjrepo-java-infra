@@ -2,17 +2,11 @@ package com.kjrepo.infra.network.http;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.EntityBuilder;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -76,11 +70,6 @@ public class KhttpUtils {
 			logger.error("", e);
 			throw new RuntimeException(e);
 		}
-	}
-
-	public static Future<HttpResponse> call(RequestBuilder request, EntityBuilder entity, HttpClientContext context,
-			FutureCallback<HttpResponse> callback) {
-		return KhttpAsyncClient.DEFAULT.call(request, entity, context, callback);
 	}
 
 }

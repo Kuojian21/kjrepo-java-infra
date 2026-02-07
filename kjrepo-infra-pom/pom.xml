@@ -73,5 +73,13 @@
 			<groupId>kjrepo-infra</groupId>
 			<artifactId>kjrepo-infra-register</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>kjrepo-infra</groupId>
+			<artifactId>kjrepo-infra-buffer</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>kjrepo-infra</groupId>
+			<artifactId>kjrepo-infra-server</artifactId>
+		</dependency>
 	</dependencies>
 </project>

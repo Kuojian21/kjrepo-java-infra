@@ -8,7 +8,6 @@ import com.annimon.stream.function.Consumer;
 import com.annimon.stream.function.Function;
 import com.kjrepo.infra.cluster.utils.InfoObjectEquals;
 import com.kjrepo.infra.common.lazy.LazySupplier;
-import com.kjrepo.infra.common.utils.StackUtils;
 import com.kjrepo.infra.register.Register;
 import com.kjrepo.infra.register.RegisterEvent;
 import com.kjrepo.infra.register.RegisterListener;
@@ -18,7 +17,7 @@ public class StandbyFactory {
 
 	public static <R, C extends StandbyInfo<?>> LazySupplier<Standby<R>> standby(Class<R> rclazz, Class<C> cclazz,
 			String key, Function<?, R> mapper, Consumer<R> release) {
-		Register<C> register = RegisterFactory.getContext(StackUtils.firstBusinessInvokerClassname()).getRegister(cclazz);
+		Register<C> register = RegisterFactory.getContext().getRegister(cclazz);
 		LazySupplier<StandbyInfo<?>> info = LazySupplier.wrap(() -> register.get(key));
 		LazySupplier<Standby<R>> standby = LazySupplier.wrap(() -> new Standby<R>(rclazz, info, mapper, release));
 		register.addListener(key, new RegisterListener<>() {

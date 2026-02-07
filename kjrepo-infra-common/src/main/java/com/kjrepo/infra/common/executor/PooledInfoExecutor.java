@@ -9,35 +9,36 @@ import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 //import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
+import com.kjrepo.infra.common.lazy.LazySupplier;
 import com.kjrepo.infra.common.term.HookHelper;
 
 public abstract class PooledInfoExecutor<T, I extends PooledInfo<T>> extends InfoExecutor<T, I> implements Closeable {
 
-	private final GenericObjectPool<T> pool;
+	private final LazySupplier<GenericObjectPool<T>> pool;
 
 	protected PooledInfoExecutor(I info) {
 		super(info);
 		if (info.getPoolConfig() == null) {
-			this.pool = null;
+			this.pool = LazySupplier.wrap(() -> null);
 		} else {
-			this.pool = new GenericObjectPool<T>(new BasePooledObjectFactory<T>() {
+			this.pool = LazySupplier.wrap(() -> {
+				return new GenericObjectPool<T>(new BasePooledObjectFactory<T>() {
+					@Override
+					public T create() throws Exception {
+						return (T) PooledInfoExecutor.this.create();
+					}
 
-				@Override
-				public T create() throws Exception {
-					return (T) PooledInfoExecutor.this.create();
-				}
+					@Override
+					public PooledObject<T> wrap(T obj) {
+						return new DefaultPooledObject<>(obj);
+					}
 
-				@Override
-				public PooledObject<T> wrap(T obj) {
-					return new DefaultPooledObject<>(obj);
-				}
-
-				@Override
-				public void destroyObject(final PooledObject<T> obj) throws Exception {
-					destroy(obj.getObject());
-				}
-
-			}, info.getPoolConfig());
+					@Override
+					public void destroyObject(final PooledObject<T> obj) throws Exception {
+						destroy(obj.getObject());
+					}
+				}, info.getPoolConfig());
+			});
 			HookHelper.addHook("pool-info-executor", () -> close());
 		}
 	}
@@ -45,10 +46,10 @@ public abstract class PooledInfoExecutor<T, I extends PooledInfo<T>> extends Inf
 	@Override
 	protected final T bean() {
 		try {
-			if (this.pool == null) {
+			if (this.pool.get() == null) {
 				return create();
 			} else {
-				return this.pool.borrowObject();
+				return this.pool.get().borrowObject();
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -58,14 +59,14 @@ public abstract class PooledInfoExecutor<T, I extends PooledInfo<T>> extends Inf
 	@Override
 	protected final <E extends Throwable> void close(T bean, E exception) {
 		try {
-			if (this.pool == null) {
+			if (this.pool.get() == null) {
 				this.destroy(bean);
 			} else {
 				if (validate(bean, exception)) {
 					this.after(bean);
-					this.pool.returnObject(bean);
+					this.pool.get().returnObject(bean);
 				} else {
-					this.pool.invalidateObject(bean);
+					this.pool.get().invalidateObject(bean);
 				}
 			}
 		} catch (Exception e) {
@@ -97,9 +98,10 @@ public abstract class PooledInfoExecutor<T, I extends PooledInfo<T>> extends Inf
 		}
 	}
 
-	public void close() throws IOException {
-		if (this.pool != null) {
-			this.pool.close();
+	public synchronized void close() throws IOException {
+		if (this.pool.isInited() && this.pool.get() != null) {
+			this.pool.get().close();
+			this.pool.refresh();
 		}
 	}
 

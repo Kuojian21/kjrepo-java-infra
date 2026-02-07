@@ -5,41 +5,45 @@ import java.io.IOException;
 
 import javax.sql.DataSource;
 
-import org.hibernate.dialect.Dialect;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.ConnectionCallback;
 
 import com.kjrepo.infra.storage.db.jdbc.Kjdbc;
 import com.kjrepo.infra.storage.db.jdbc.KjdbcImpl;
+import com.kjrepo.infra.storage.db.model.KdbDialect;
 import com.kjrepo.infra.storage.db.utils.KdbUtils;
 
 public class KjdbcRepository implements Closeable {
 
-	private final DataSource dataSource;
+	private final KdbDialect dialect;
 	private final NamedParameterJdbcTemplate jdbcTemplate;
 
 	public KjdbcRepository(DataSource dataSource) {
-		this.dataSource = dataSource;
-		this.jdbcTemplate = new NamedParameterJdbcTemplate(this.dataSource);
+		this(new NamedParameterJdbcTemplate(dataSource));
 	}
 
 	public KjdbcRepository(NamedParameterJdbcTemplate jdbcTemplate) {
-		this.dataSource = null;
 		this.jdbcTemplate = jdbcTemplate;
+		this.dialect = jdbcTemplate.getJdbcOperations()
+				.execute((ConnectionCallback<KdbDialect>) conn -> KdbUtils.dialect(conn));
 	}
 
 	public <T> Kjdbc<T> jdbc(Class<T> clazz) {
 		return new KjdbcImpl<>(clazz) {
-
 			@Override
 			public NamedParameterJdbcTemplate jdbcTemplate() {
 				return jdbcTemplate;
 			}
 
+			@Override
+			public KdbDialect dialect() {
+				return dialect;
+			}
 		};
 	}
 
-	public Dialect dialect() {
-		return KdbUtils.dialect(dataSource);
+	public KdbDialect dialect() {
+		return this.dialect;
 	}
 
 	public NamedParameterJdbcTemplate jdbcTemplate() {
@@ -48,8 +52,9 @@ public class KjdbcRepository implements Closeable {
 
 	@Override
 	public void close() throws IOException {
-		if (this.dataSource instanceof Closeable) {
-			((Closeable) this.dataSource).close();
+		DataSource dataSource = this.jdbcTemplate.getJdbcTemplate().getDataSource();
+		if (dataSource instanceof Closeable) {
+			((Closeable) dataSource).close();
 		}
 	}
 

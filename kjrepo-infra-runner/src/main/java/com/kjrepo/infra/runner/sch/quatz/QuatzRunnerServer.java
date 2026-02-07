@@ -2,12 +2,13 @@ package com.kjrepo.infra.runner.sch.quatz;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+//import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronScheduleBuilder;
+import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -33,9 +34,10 @@ public class QuatzRunnerServer extends AbstractRunnerServer<QuatzRunner> {
 			Scheduler sch = new QuatzStdSchedulerFactory(properties()).getScheduler();
 			sch.start();
 			TermHelper.addTerm("Scheduler", () -> sch.shutdown(true));
-			QuatzJobStat job = new QuatzJobStat(sch);
-			sch.scheduleJob(QuatzJobDetailBuilder.job(job).withIdentity(job.name(), job.group()).build(),
-					TriggerBuilder.newTrigger().withIdentity(job.name(), job.group()).startNow()
+			sch.scheduleJob(
+					JobBuilder.newJob(QuatzJobReporter.class)
+							.withIdentity(QuatzJobReporter.NAME, QuatzJobReporter.GROUP).build(),
+					TriggerBuilder.newTrigger().withIdentity(QuatzJobReporter.NAME, QuatzJobReporter.GROUP).startNow()
 							.withSchedule(
 									SimpleScheduleBuilder.simpleSchedule().withIntervalInMinutes(3).repeatForever())
 							.build());
@@ -46,25 +48,23 @@ public class QuatzRunnerServer extends AbstractRunnerServer<QuatzRunner> {
 	});
 
 	@Override
-	public QuatzRunnerServer run(List<QuatzRunner> runners) {
-		runners.forEach(runner -> {
-			for (int i = 0; i < runner.crons().length; i++) {
-				try {
-					String jobID = Optional.ofNullable(runner.ID()).filter(id -> StringUtils.isNotEmpty(id))
-							.orElseGet(() -> "job" + number.incrementAndGet()) + "#" + i;
-					JobDetail jobDetail = QuatzJobDetailBuilder
-							.job(runner.isConcurrentRunning() ? new QuatzJobConcurrent(runner)
-									: new QuatzJobConcurrentDisallow(runner))
-							.withIdentity(jobID, runner.module()).build();
-					MutableTrigger trigger = CronScheduleBuilder.cronSchedule(runner.crons()[i]).build();
-					trigger.setKey(TriggerKey.triggerKey(jobID, runner.module()));
-					scheduler.get().scheduleJob(jobDetail, trigger);
-				} catch (SchedulerException e) {
-					logger.error("", e);
-				}
+	protected void doRun(QuatzRunner runner) {
+//		runners.forEach(runner -> {
+		for (int i = 0; i < runner.crons().length; i++) {
+			try {
+				String jobID = Optional.ofNullable(runner.ID()).filter(id -> StringUtils.isNotEmpty(id))
+						.orElseGet(() -> "job" + number.incrementAndGet()) + "#" + i;
+				JobDetail jobDetail = QuatzJobDetailBuilder.job(new QuatzJob(runner))
+						.withIdentity(jobID, runner.module()).build();
+				MutableTrigger trigger = CronScheduleBuilder.cronSchedule(runner.crons()[i]).build();
+				trigger.setKey(TriggerKey.triggerKey(jobID, runner.module()));
+				scheduler.get().scheduleJob(jobDetail, trigger);
+			} catch (SchedulerException e) {
+				logger.error("", e);
 			}
-		});
-		return this;
+		}
+//		});
+//		return this;
 	}
 
 	public Properties properties() {
@@ -73,7 +73,7 @@ public class QuatzRunnerServer extends AbstractRunnerServer<QuatzRunner> {
 			props.load(in);
 			if (!props.containsKey("org.quartz.threadPool.threadCount")) {
 				props.put("org.quartz.threadPool.threadCount",
-						Math.min(Runtime.getRuntime().availableProcessors(), 6) + "");
+						Math.min(Math.max(Runtime.getRuntime().availableProcessors(), 6), 12) + "");
 			}
 			props.putAll(System.getProperties());
 			return props;
@@ -81,5 +81,10 @@ public class QuatzRunnerServer extends AbstractRunnerServer<QuatzRunner> {
 			logger.error("", e);
 			return null;
 		}
+	}
+
+	@Override
+	protected boolean nlock() {
+		return true;
 	}
 }

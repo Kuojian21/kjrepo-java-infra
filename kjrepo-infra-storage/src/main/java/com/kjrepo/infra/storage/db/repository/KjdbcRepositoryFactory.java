@@ -37,8 +37,8 @@ public class KjdbcRepositoryFactory {
 	}
 
 	public static <I> NamedParameterJdbcTemplate jdbc(Class<I> clazz, String key, Function<I, DataSource> mapper) {
-		return new NamedParameterJdbcTemplate(
-				mapper.apply(RegisterFactory.getContext(StackUtils.firstBusinessInvokerClassname()).getRegister(clazz).get(key)));
+		return new NamedParameterJdbcTemplate(mapper.apply(
+				RegisterFactory.getContext(StackUtils.firstBusinessInvokerClassname()).getRegister(clazz).get(key)));
 	}
 
 	public static <T, I, S extends StandbyInfo<I>> Kjdbc<T> standby(Class<S> sclazz, Function<I, DataSource> mapper,
@@ -84,7 +84,7 @@ public class KjdbcRepositoryFactory {
 				}));
 	}
 
-	public static <T, K, I, C extends ClusterInfo<I>> KjdbcCluster<T, K> cluster(Class<C> cclazz, String key,
+	public static <T, K, I, C extends ClusterInfo<I>> KjdbcCluster<T> cluster(Class<C> cclazz, String key,
 			Function<I, DataSource> mapper, Class<T> clazz, Function<K, String> sharding) {
 		Cluster<NamedParameterJdbcOperations> cluster = cluster(cclazz, key, mapper);
 		return new KjdbcClusterImpl<>(clazz) {

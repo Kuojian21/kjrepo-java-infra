@@ -18,7 +18,7 @@ public class FileUtils {
 			if (file.exists()) {
 				return;
 			}
-			synchronized (FileUtils.class + "#" + file.getName()) {
+			synchronized ((FileUtils.class + "#" + file.getName()).intern()) {
 				if (file.exists()) {
 					return;
 				}
@@ -37,7 +37,7 @@ public class FileUtils {
 		if (file.exists()) {
 			return;
 		}
-		synchronized (FileUtils.class + "#" + file.getName()) {
+		synchronized ((FileUtils.class + "#" + file.getName()).intern()) {
 			if (file.exists()) {
 				return;
 			}

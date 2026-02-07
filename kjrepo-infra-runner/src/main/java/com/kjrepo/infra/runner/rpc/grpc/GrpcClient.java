@@ -1,5 +1,7 @@
 package com.kjrepo.infra.runner.rpc.grpc;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import com.annimon.stream.Collectors;
@@ -26,26 +28,27 @@ public class GrpcClient {
 		}
 	}
 
-	private final Map<Class<?>, GrpcClientMeta<?>> clusters;
+	private final GrpcClientMeta meta;
+	private final Map<Class<?>, Method> methods;
 
-	@SuppressWarnings("unchecked")
 	public GrpcClient(String key, Class<?> clazz) {
-		try {
-			this.clusters = Stream.of(
-					new GrpcClientMeta<>(key,
-							clazz.getDeclaredMethod("newBlockingStub", new Class<?>[] { Channel.class })),
-					new GrpcClientMeta<>(key,
-							clazz.getDeclaredMethod("newFutureStub", new Class<?>[] { Channel.class })),
-					new GrpcClientMeta<>(key, clazz.getDeclaredMethod("newStub", new Class<?>[] { Channel.class })))
-					.collect(Collectors.toMap(m -> m.clazz(), m -> m));
-		} catch (NoSuchMethodException | SecurityException e) {
-			throw new RuntimeException(e);
-		}
+		this.meta = new GrpcClientMeta(key, clazz);
+		this.methods = Stream.of("newBlockingStub", "newFutureStub", "newStub").map(m -> {
+			try {
+				return clazz.getDeclaredMethod(m, new Class<?>[] { Channel.class });
+			} catch (NoSuchMethodException | SecurityException e) {
+				throw new RuntimeException(e);
+			}
+		}).collect(Collectors.toMap(m -> m.getReturnType().getInterfaces()[0], m -> m));
 	}
 
 	@SuppressWarnings("unchecked")
 	public <R> R get(Class<R> clazz) {
-		return (R) clusters.get(clazz).cluster().get().getResource();
+		try {
+			return (R) methods.get(clazz).invoke(null, new Object[] { meta.channel() });
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

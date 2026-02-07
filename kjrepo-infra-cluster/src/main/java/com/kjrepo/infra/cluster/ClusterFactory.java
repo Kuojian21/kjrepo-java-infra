@@ -9,7 +9,6 @@ import com.annimon.stream.function.Function;
 import com.kjrepo.infra.cluster.instance.InstanceInfo;
 import com.kjrepo.infra.cluster.utils.InfoObjectEquals;
 import com.kjrepo.infra.common.lazy.LazySupplier;
-import com.kjrepo.infra.common.utils.StackUtils;
 import com.kjrepo.infra.gregister.GroupRegister;
 import com.kjrepo.infra.gregister.GroupRegisterListener;
 import com.kjrepo.infra.gregister.context.GroupRegisterFactory;
@@ -22,8 +21,7 @@ public class ClusterFactory {
 
 	public static <R, I, C extends ClusterInfo<I>> LazySupplier<Cluster<R>> gcluster(Class<R> rclazz, Class<C> cclazz,
 			Class<I> iclazz, String key, Function<InstanceInfo<I>, R> mapper, Consumer<R> release) {
-		GroupRegister<C, I> gregister = GroupRegisterFactory.getContext(StackUtils.firstBusinessInvokerClassname())
-				.getGroupRegister(cclazz, iclazz);
+		GroupRegister<C, I> gregister = GroupRegisterFactory.getContext().getGroupRegister(cclazz, iclazz);
 		LazySupplier<ClusterInfo<?>> info = LazySupplier.wrap(() -> {
 			ClusterInfo<I> cinfo = gregister.get(key);
 			cinfo.setInstanceInfos(
@@ -58,7 +56,7 @@ public class ClusterFactory {
 			@Override
 			public void onChange(RegisterEvent<I> event) {
 				info.refresh();
-				cluster.get().refresh(event.getKey().replace(key + "/", ""));
+				cluster.get().refresh(event.getKey());
 			}
 
 		});
@@ -67,7 +65,7 @@ public class ClusterFactory {
 
 	public static <R, I, C extends ClusterInfo<I>> LazySupplier<Cluster<R>> cluster(Class<R> rclazz, Class<C> cclazz,
 			String key, Function<InstanceInfo<I>, R> mapper, Consumer<R> release) {
-		Register<C> register = RegisterFactory.getContext(StackUtils.firstBusinessInvokerClassname()).getRegister(cclazz);
+		Register<C> register = RegisterFactory.getContext().getRegister(cclazz);
 		LazySupplier<ClusterInfo<?>> info = LazySupplier.wrap(() -> register.get(key));
 		LazySupplier<Cluster<R>> cluster = LazySupplier.wrap(() -> new Cluster<R>(rclazz, info, mapper, release));
 		register.addListener(key, new RegisterListener<>() {

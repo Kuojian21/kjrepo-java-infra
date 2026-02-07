@@ -8,6 +8,11 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>kjrepo-infra-text</artifactId>
+
+	<properties>
+		<jackson.version>2.19.2</jackson.version>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>kjrepo-infra</groupId>
@@ -18,6 +23,16 @@
 			<groupId>org.freemarker</groupId>
 			<artifactId>freemarker</artifactId>
 			<version>2.3.34</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ibeetl</groupId>
+			<artifactId>beetl</artifactId>
+			<version>3.19.2.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jfinal</groupId>
+			<artifactId>enjoy</artifactId>
+			<version>5.2.5</version>
 		</dependency>
 
 		<!--
@@ -74,7 +89,7 @@
 		<dependency>
 			<groupId>com.hubspot.jackson</groupId>
 			<artifactId>jackson-datatype-protobuf</artifactId>
-			<version>0.9.10-jackson2.9-proto3</version>
+			<version>0.9.18</version>
 		</dependency>
 
 		<dependency>

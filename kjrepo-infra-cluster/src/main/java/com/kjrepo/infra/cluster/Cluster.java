@@ -43,6 +43,9 @@ public class Cluster<R> implements Closeable {
 				LazySupplier<Instance<R>> instance = LazySupplier.wrap(() -> {
 					InstanceInfo<?> tInfo = Stream.of(info.get().getInstanceInfos())
 							.collect(Collectors.toMap(i -> i.getName(), i -> i)).get(iInfo.getName());
+					if (tInfo == null) {
+						return null;
+					}
 					return Instance.of(tInfo.getName(), clazz, ((Function<InstanceInfo<?>, R>) mapper).apply(tInfo),
 							release);
 				});
@@ -76,8 +79,8 @@ public class Cluster<R> implements Closeable {
 		return this.selector.get().select().get();
 	}
 
-	public R getResource(Object... args) {
-		return this.selector.get().select(args).get();
+	public R getResource(Long key) {
+		return this.selector.get().select(key).get();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -86,6 +89,9 @@ public class Cluster<R> implements Closeable {
 		LazySupplier<Instance<R>> instance = LazySupplier.wrap(() -> {
 			InstanceInfo<?> tInfo = Stream.of(info.get().getInstanceInfos())
 					.collect(Collectors.toMap(i -> i.getName(), i -> i)).get(key);
+			if (tInfo == null) {
+				return null;
+			}
 			return Instance.of(tInfo.getName(), clazz, ((Function<Object, R>) mapper).apply((Object) tInfo.getInfo()));
 		});
 		if (this.instanceMap.putIfAbsent(key, instance) == null) {

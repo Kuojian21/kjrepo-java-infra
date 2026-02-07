@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.kjrepo.infra.trace.utils.TraceIDUtils;
+import com.kjrepo.infra.common.trace.TraceIDUtils;
 
 import okhttp3.Interceptor;
 import okhttp3.Request;

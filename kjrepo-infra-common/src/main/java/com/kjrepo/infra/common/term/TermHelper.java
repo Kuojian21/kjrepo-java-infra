@@ -5,13 +5,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 
+import com.annimon.stream.function.Function;
 import com.github.phantomthief.util.ThrowableRunnable;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Sets;
 import com.kjrepo.infra.common.logger.LoggerUtils;
 import com.kjrepo.infra.common.number.N_humanUtils;
+import com.kjrepo.infra.common.trace.TraceIDUtils;
 
 public class TermHelper {
 
@@ -39,19 +42,36 @@ public class TermHelper {
 	static {
 		SignalHelper.handle("TERM", signal -> {
 			try {
+				TraceIDUtils.generate();
 				stopping.set(true);
+				Stopwatch st = Stopwatch.createStarted();
+				logger.info("The terms-execution will be run!!!");
 				terms.stream().sorted((a, b) -> Integer.compare(a.getPriority(), b.getPriority())).forEach(term -> {
 					Stopwatch stopwatch = Stopwatch.createStarted();
+					Function<String, String> msg = result -> new StringSubstitutor(key -> {
+						switch (key) {
+						case "module":
+							return term.getModule();
+						case "priority":
+							return term.getPriority() + "";
+						case "result":
+							return result;
+						case "elapsed":
+							return N_humanUtils.formatMills(stopwatch.elapsed(TimeUnit.MILLISECONDS));
+						default:
+							return key;
+						}
+					}).replace("The term module:${module} priority:${priority} run ${result},elapsed:${elapsed}!!!");
 					try {
 						term.getRunnable().run();
-						logger.info("Signal-TERM FINISH module:{} priority:{} elapsed:{}s", term.getModule(),
-								term.getPriority(), N_humanUtils.formatMills(stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+						logger.info(msg.apply("completely"));
 					} catch (Throwable e) {
-						logger.error("Signal-TERM ERROR module:{} priority:{} elapsed:{}s", term.getModule(),
-								term.getPriority(), N_humanUtils.formatMills(stopwatch.elapsed(TimeUnit.MILLISECONDS)),
-								e);
+						logger.error(msg.apply("wrongly"), e);
 					}
 				});
+				logger.info("The terms-execution has been finished,elapsed:{}!!!",
+						N_humanUtils.formatMills(st.elapsed(TimeUnit.MILLISECONDS)));
+				TraceIDUtils.clear();
 			} finally {
 				System.exit(signal.getNumber());
 			}

@@ -9,7 +9,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.header.internals.RecordHeader;
 
-import com.kjrepo.infra.trace.utils.TraceIDUtils;
+import com.kjrepo.infra.common.trace.TraceIDUtils;
 
 public class TraceProducerInterceptor<K, V> implements ProducerInterceptor<K, V> {
 

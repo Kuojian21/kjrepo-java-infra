@@ -8,7 +8,7 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.protocol.HttpContext;
 
-import com.kjrepo.infra.trace.utils.TraceIDUtils;
+import com.kjrepo.infra.common.trace.TraceIDUtils;
 
 public class TraceHttpRequestInterceptor implements HttpRequestInterceptor {
 

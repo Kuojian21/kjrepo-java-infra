@@ -43,7 +43,7 @@ class Hikari {
 		config.setMaxLifetime(0L);
 		config.setRegisterMbeans(false);
 	}
-	
+
 	public static HikariConfig defaultHikariConfig() {
 		HikariConfig config = new HikariConfig();
 		config.addDataSourceProperty("cachePrepStmts", "true");

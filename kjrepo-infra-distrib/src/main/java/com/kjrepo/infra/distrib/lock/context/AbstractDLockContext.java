@@ -10,14 +10,14 @@ import com.kjrepo.infra.distrib.lock.nolock.NoDLock;
 
 public abstract class AbstractDLockContext implements IDLockContext {
 
-	private final ConcurrentMap<String, DLock> registers = Maps.newConcurrentMap();
+	private final ConcurrentMap<String, DLock> locks = Maps.newConcurrentMap();
 
 	@Override
 	public final DLock getLock(String key) {
 		if (StringUtils.isEmpty(key)) {
 			return new NoDLock(key);
 		}
-		return registers.computeIfAbsent(key, cl -> newLock(key));
+		return locks.computeIfAbsent(key, cl -> newLock(key));
 	}
 
 	public abstract DLock newLock(String key);

@@ -1,7 +1,6 @@
 package com.kjrepo.infra.cluster.selector;
 
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 import com.google.common.collect.Lists;
 import com.kjrepo.infra.cluster.instance.Instance;
@@ -14,9 +13,18 @@ public class RandomSelector<R> extends AbstractSelector<R> {
 	}
 
 	@Override
-	public Instance<R> select(Object... args) {
+	public Instance<R> select(Long key) {
 		List<LazySupplier<Instance<R>>> list = Lists.newArrayList(super.instances);
-		return list.get(ThreadLocalRandom.current().nextInt(list.size())).get();
+		while (list.size() > 0) {
+			LazySupplier<Instance<R>> instance = list.get((int) (key % list.size()));
+			if (instance.get() == null) {
+				logger.warn("The instance is NULL!!!");
+				list.remove(instance);
+			} else {
+				return instance.get();
+			}
+		}
+		return null;
 	}
 
 }

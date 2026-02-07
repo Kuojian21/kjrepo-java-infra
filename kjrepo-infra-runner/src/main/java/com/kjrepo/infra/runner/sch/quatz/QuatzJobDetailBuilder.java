@@ -1,19 +1,18 @@
 package com.kjrepo.infra.runner.sch.quatz;
 
-import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 
 public class QuatzJobDetailBuilder extends JobBuilder {
 
-	public static <T extends Job> QuatzJobDetailBuilder job(T job) {
+	public static <T extends QuatzJob> QuatzJobDetailBuilder job(T job) {
 		return new QuatzJobDetailBuilder(job);
 	}
 
-	private final Job job;
+	private final QuatzJob job;
 	private Object[] args;
 
-	private QuatzJobDetailBuilder(Job job) {
+	private QuatzJobDetailBuilder(QuatzJob job) {
 		super();
 		this.job = job;
 		this.ofType(job.getClass());

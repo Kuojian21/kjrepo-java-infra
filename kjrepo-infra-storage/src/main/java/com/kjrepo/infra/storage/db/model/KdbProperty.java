@@ -60,11 +60,60 @@ public class KdbProperty {
 		return false;
 	}
 
+	public boolean primary() {
+		if (kdbColumn != null) {
+			return kdbColumn.primary();
+		}
+		return false;
+	}
+
+	public boolean unique() {
+		if (kdbColumn != null) {
+			return kdbColumn.unique();
+		}
+		return false;
+	}
+
+	public boolean nullable() {
+		if (kdbColumn != null) {
+			return kdbColumn.nullable();
+		}
+		return true;
+	}
+
 	public String column() {
 		if (kdbColumn != null && StringUtils.isNotEmpty(kdbColumn.name())) {
 			return kdbColumn.name();
 		}
 		return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name());
+	}
+
+	public String definition() {
+		if (kdbColumn != null) {
+			return kdbColumn.definition();
+		}
+		return "";
+	}
+
+	public boolean defInsert() {
+		if (kdbColumn != null) {
+			return kdbColumn.defInsert();
+		}
+		return false;
+	}
+
+	public boolean defUpdate() {
+		if (kdbColumn != null) {
+			return kdbColumn.defUpdate();
+		}
+		return false;
+	}
+
+	public String comment() {
+		if (kdbColumn != null) {
+			return kdbColumn.comment();
+		}
+		return "";
 	}
 
 	public KdbColumn kdbColumn() {

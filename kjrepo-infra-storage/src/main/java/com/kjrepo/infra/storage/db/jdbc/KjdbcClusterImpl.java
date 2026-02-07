@@ -2,7 +2,7 @@ package com.kjrepo.infra.storage.db.jdbc;
 
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
-public abstract class KjdbcClusterImpl<T, K> implements KjdbcCluster<T, K> {
+public abstract class KjdbcClusterImpl<T> implements KjdbcCluster<T> {
 
 	private final Class<T> clazz;
 
@@ -10,7 +10,7 @@ public abstract class KjdbcClusterImpl<T, K> implements KjdbcCluster<T, K> {
 		this.clazz = clazz;
 	}
 
-	public Kjdbc<T> sharding(K key) {
+	public Kjdbc<T> sharding(Long key) {
 		return new KjdbcImpl<T>(this.clazz) {
 
 			@Override
