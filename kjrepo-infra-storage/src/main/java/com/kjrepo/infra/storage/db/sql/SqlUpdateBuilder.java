@@ -8,6 +8,7 @@ import org.apache.commons.text.StringSubstitutor;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.google.common.collect.Lists;
 import com.kjrepo.infra.common.info.Pair;
 import com.kjrepo.infra.common.lazy.LazySupplier;
 import com.kjrepo.infra.storage.db.model.KdbProperty;
@@ -23,8 +24,12 @@ public class SqlUpdateBuilder extends SqlBuilder {
 
 	public SqlUpdateBuilder(List<Pair<String, Object>> update) {
 		this.sql = LazySupplier.wrap(() -> {
+			List<Pair<String, Object>> iUpdate = Lists.newArrayList(update);
+			model().updateProperties().forEach(p -> {
+				iUpdate.add(Pair.pair(p.column(), null));
+			});
 			StringBuilder sql = new StringBuilder().append("update ").append(table()).append(" set ")
-					.append(StringUtils.join(Stream.of(update).map(e -> {
+					.append(StringUtils.join(Stream.of(iUpdate).map(e -> {
 						KdbProperty property = model().getProperty(e.getKey());
 						if (e.getValue() instanceof SqlValueExpr) {
 							SqlValueExpr svExpr = (SqlValueExpr) e.getValue();
@@ -36,7 +41,7 @@ public class SqlUpdateBuilder extends SqlBuilder {
 									})), SqlValueExpr.INSERT_VALUE_PREFIX, SqlValueExpr.INSERT_VALUE_SUFFIX);
 						}
 						String var = SqlUtils.var();
-						valueMap().put(var, property.cast(e.getValue()));
+						valueMap().put(var, property.value_update(e.getValue()));
 						return property.column() + " = :" + var;
 					}).toList(), ","));
 			if (this.where != null && StringUtils.isNotEmpty(this.where.init(table(), model(), dialect()).sql())) {

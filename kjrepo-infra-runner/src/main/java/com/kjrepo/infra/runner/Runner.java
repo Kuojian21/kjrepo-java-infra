@@ -2,7 +2,6 @@ package com.kjrepo.infra.runner;
 
 import com.kjrepo.infra.runner.server.RunnerServer;
 import com.kjrepo.infra.runner.server.RunnerServerFactory;
-//import com.kjrepo.infra.runner.utils.RunnerUtils;
 
 public interface Runner {
 
@@ -16,8 +15,7 @@ public interface Runner {
 
 	@SuppressWarnings("unchecked")
 	default <R extends Runner> void execute() {
-//		RunnerUtils.run(RunnerServerFactory.server(this.getClass()), this);
-		((RunnerServer<R>) RunnerServerFactory.server(this.getClass())).init().run((R) this);
+		((RunnerServer<R>) RunnerServerFactory.server(this.getClass())).run((R) this);
 	}
 
 }

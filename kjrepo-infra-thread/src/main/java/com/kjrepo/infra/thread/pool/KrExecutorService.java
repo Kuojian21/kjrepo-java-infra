@@ -1,15 +1,12 @@
 package com.kjrepo.infra.thread.pool;
 
-import java.io.Closeable;
 import java.util.concurrent.ExecutorService;
 
-public interface KrExecutorService extends ExecutorService, Closeable {
+public interface KrExecutorService extends ExecutorService, AutoCloseable {
 
 	void shutdownBlocking();
 
 	@Override
-	default void close() {
-		this.shutdown();
-	}
+	void close();
 
 }

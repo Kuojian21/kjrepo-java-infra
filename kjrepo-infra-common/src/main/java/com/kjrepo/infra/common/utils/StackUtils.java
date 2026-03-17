@@ -14,9 +14,13 @@ public class StackUtils {
 	public static StackTraceElement firstBusinessInvokerElement() {
 		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
 		StackTraceElement element = Stream.of(elements) //
-				.filter(e -> StringUtils.isNotEmpty(e.getClassName()))
-				.filter(e -> !"java.lang.Thread".equals(e.getClassName()))
-				.filter(e -> !e.getClassName().startsWith("com.kjrepo.infra")).findFirst().orElse(elements[1]);
+				.filter(e -> StringUtils.isNotEmpty(e.getClassName())) //
+				.filter(e -> !e.getClassName().startsWith("java.")) //
+				.filter(e -> !e.getClassName().startsWith("javax.")) //
+				.filter(e -> !e.getClassName().startsWith("jdk.internal.")) //
+				.filter(e -> !e.getClassName().startsWith("sun.")) //
+				.filter(e -> !e.getClassName().startsWith("com.kjrepo.infra")) //
+				.findFirst().orElse(elements[1]);
 		if (Stream.of(elements)
 				.allMatch(e -> !"<clinit>".equals(e.getMethodName()) && !"<init>".equals(e.getMethodName()))) {
 			LoggerUtils.logger(StackUtils.class).error(

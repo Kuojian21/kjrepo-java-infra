@@ -4,10 +4,10 @@ import javax.mail.Store;
 
 import com.sun.mail.imap.IMAPStore;
 import com.google.common.collect.ImmutableMap;
-import com.kjrepo.infra.common.executor.PooledInfoExecutor;
+import com.kjrepo.infra.executor.pool.PoolExecutor;
 import com.kjrepo.infra.network.mail.MailUtils;
 
-public class MailReceiver extends PooledInfoExecutor<Store, MailReceiverInfo> {
+public class MailReceiver extends PoolExecutor<Store, MailReceiverInfo> {
 
 	public MailReceiver(MailReceiverInfo info) {
 		super(info);
@@ -21,6 +21,12 @@ public class MailReceiver extends PooledInfoExecutor<Store, MailReceiverInfo> {
 			((IMAPStore) store).id(ImmutableMap.of("name", "kjrepo"));
 		}
 		return store;
+	}
+
+	@Override
+	protected String tag() {
+		String username = this.info().getAuth().getUsername();
+		return username.substring(username.indexOf('@') + 1);
 	}
 
 }

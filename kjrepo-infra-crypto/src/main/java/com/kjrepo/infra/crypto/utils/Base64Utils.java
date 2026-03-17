@@ -3,62 +3,46 @@ package com.kjrepo.infra.crypto.utils;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+import com.annimon.stream.Optional;
+
 public class Base64Utils {
 
-	public static String decodeToString(String data) {
-		if (data == null) {
-			return null;
-		}
-		return new String(decode(data), StandardCharsets.UTF_8);
-	}
-
-	public static String decodeToString(byte[] data) {
-		if (data == null) {
-			return null;
-		}
-		return new String(decode(data), StandardCharsets.UTF_8);
-	}
-
-	public static byte[] decode(String data) {
-		if (data == null) {
-			return null;
-		}
-		return decode(data.getBytes(StandardCharsets.UTF_8));
-	}
-
-	public static byte[] decode(byte[] data) {
-		if (data == null) {
-			return null;
-		}
-		return Base64.getDecoder().decode(data);
-	}
-
 	public static String encodeToString(String data) {
-		if (data == null) {
-			return null;
-		}
-		return new String(encode(data), StandardCharsets.UTF_8);
+		return Optional.ofNullable(data).map(s -> s.getBytes(StandardCharsets.UTF_8)).map(Base64Utils::encode)
+				.map(b -> new String(b, StandardCharsets.UTF_8)).orElse(null);
+	}
+
+	public static String decodeToString(String data) {
+		return Optional.ofNullable(data).map(s -> s.getBytes(StandardCharsets.UTF_8)).map(Base64Utils::decode)
+				.map(b -> new String(b, StandardCharsets.UTF_8)).orElse(null);
 	}
 
 	public static String encodeToString(byte[] data) {
-		if (data == null) {
-			return null;
-		}
-		return new String(encode(data), StandardCharsets.UTF_8);
+		return Optional.ofNullable(data).map(Base64Utils::encode).map(b -> new String(b, StandardCharsets.UTF_8))
+				.orElse(null);
+	}
+
+	public static String decodeToString(byte[] data) {
+		return Optional.ofNullable(data).map(Base64Utils::decode).map(b -> new String(b, StandardCharsets.UTF_8))
+				.orElse(null);
 	}
 
 	public static byte[] encode(String data) {
-		if (data == null) {
-			return null;
-		}
-		return encode(data.getBytes(StandardCharsets.UTF_8));
+		return Optional.ofNullable(data).map(s -> s.getBytes(StandardCharsets.UTF_8)).map(Base64Utils::encode)
+				.orElse(null);
+	}
+
+	public static byte[] decode(String data) {
+		return Optional.ofNullable(data).map(s -> s.getBytes(StandardCharsets.UTF_8)).map(Base64Utils::decode)
+				.orElse(null);
 	}
 
 	public static byte[] encode(byte[] data) {
-		if (data == null) {
-			return null;
-		}
-		return Base64.getEncoder().encode(data);
+		return Optional.ofNullable(data).map(Base64.getEncoder()::encode).orElse(null);
+	}
+
+	public static byte[] decode(byte[] data) {
+		return Optional.ofNullable(data).map(Base64.getDecoder()::decode).orElse(null);
 	}
 
 }

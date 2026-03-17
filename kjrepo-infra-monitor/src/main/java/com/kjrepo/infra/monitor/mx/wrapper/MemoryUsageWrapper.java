@@ -26,20 +26,20 @@ public class MemoryUsageWrapper {
 		return this.usage;
 	}
 
-	public String used() {
-		return N_humanUtils.formatByte(usage.getUsed());
+	public Long used() {
+		return usage.getUsed();
 	}
 
-	public String committed() {
-		return N_humanUtils.formatByte(usage.getCommitted());
+	public Long committed() {
+		return usage.getCommitted();
 	}
 
-	public String init() {
-		return N_humanUtils.formatByte(usage.getInit());
+	public Long init() {
+		return usage.getInit();
 	}
 
-	public String max() {
-		return N_humanUtils.formatByte(usage.getMax());
+	public Long max() {
+		return usage.getMax();
 	}
 
 	public double rate() {
@@ -50,16 +50,16 @@ public class MemoryUsageWrapper {
 	}
 
 	public String toString() {
-		return usage == null ? "" : new StringSubstitutor(key -> {
+		return this.usage == null ? "" : new StringSubstitutor(key -> {
 			switch (key) {
 			case "used":
-				return used();
+				return N_humanUtils.formatByte(used());
 			case "committed":
-				return committed();
+				return N_humanUtils.formatByte(committed());
 			case "init":
-				return init();
+				return N_humanUtils.formatByte(init());
 			case "max":
-				return max();
+				return N_humanUtils.formatByte(max());
 			case "rate":
 				return rate() + "";
 			default:

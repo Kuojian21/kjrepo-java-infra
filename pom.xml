@@ -27,6 +27,7 @@
 		<module>kjrepo-infra-buffer</module>
 		<module>kjrepo-infra-server</module>
 		<module>kjrepo-infra-crawler</module>
+		<module>kjrepo-infra-executor</module>
 	</modules>
 
 	<properties>
@@ -126,6 +127,11 @@
 			<dependency>
 				<groupId>kjrepo-infra</groupId>
 				<artifactId>kjrepo-infra-server</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>kjrepo-infra</groupId>
+				<artifactId>kjrepo-infra-executor</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 		</dependencies>

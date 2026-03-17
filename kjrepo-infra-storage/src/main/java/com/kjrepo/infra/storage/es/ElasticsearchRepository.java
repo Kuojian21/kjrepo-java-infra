@@ -6,9 +6,9 @@ import java.io.IOException;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClient.FailureListener;
 
-import com.kjrepo.infra.common.executor.PooledInfoExecutor;
+import com.kjrepo.infra.executor.pool.PoolExecutor;
 
-public class ElasticsearchRepository extends PooledInfoExecutor<RestClient, ElasticsearchInfo> {
+public class ElasticsearchRepository extends PoolExecutor<RestClient, ElasticsearchInfo> {
 
 	public ElasticsearchRepository(ElasticsearchInfo info) {
 		super(info);

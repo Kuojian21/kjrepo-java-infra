@@ -23,7 +23,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
+//import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 //import com.fasterxml.jackson.module.kotlin.KotlinModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
@@ -40,9 +40,10 @@ public class JsonUtils {
 			.setSerializationInclusion(JsonInclude.Include.NON_NULL) //
 			.registerModule(new GuavaModule()) //
 			.registerModule(new ParameterNamesModule()) //
-//			.registerModule(new KotlinModule()) //
 			.registerModule(new ProtobufModule()) //
-			.registerModule(new JacksonXmlModule()); //
+//			.registerModule(new KotlinModule()) //
+//			.registerModule(new JacksonXmlModule())
+	; 
 
 	public static String toJson(@Nullable Object obj) {
 		if (obj == null) {

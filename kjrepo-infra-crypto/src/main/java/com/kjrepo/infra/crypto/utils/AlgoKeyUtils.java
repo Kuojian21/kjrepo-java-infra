@@ -1,6 +1,7 @@
 package com.kjrepo.infra.crypto.utils;
 
 import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -13,15 +14,15 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESedeKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import com.kjrepo.infra.crypto.CryptoRuntimeException;
 
 public class AlgoKeyUtils {
 
@@ -29,20 +30,31 @@ public class AlgoKeyUtils {
 		Security.addProvider(new BouncyCastleProvider());
 	}
 
-	public static SecretKey loadKey(String keyAlgorithm, byte[] key) {
-//		try {
-		return new SecretKeySpec(key, keyAlgorithm);
-//			return SecretKeyFactory.getInstance(keyAlgorithm).generateSecret(new DESedeKeySpec(key));
-//		} catch (InvalidKeySpecException | NoSuchAlgorithmException | InvalidKeyException e) {
-//			throw new CryptRuntimeException(e);
-//		}
+	public static SecretKey loadKey(String keyAlgorithm, String key) {
+		return loadKey(keyAlgorithm, Base64.getDecoder().decode(key));
+	}
+
+	public static PublicKey loadPublicKey(String algorithm, String key) {
+		return loadPublicKey(algorithm, Base64.getDecoder().decode(key));
+	}
+
+	public static PrivateKey loadPrivateKey(String algorithm, String key) {
+		return loadPrivateKey(algorithm, Base64.getDecoder().decode(key));
+	}
+
+	public static SecretKey loadKey(String algorithm, byte[] key) {
+		try {
+			return SecretKeyFactory.getInstance(algorithm).generateSecret(new DESedeKeySpec(key));
+		} catch (InvalidKeyException | InvalidKeySpecException | NoSuchAlgorithmException e) {
+			return new SecretKeySpec(key, algorithm);
+		}
 	}
 
 	public static PublicKey loadPublicKey(String algorithm, byte[] key) {
 		try {
 			return KeyFactory.getInstance(algorithm).generatePublic(new X509EncodedKeySpec(key));
 		} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-			throw new CryptoRuntimeException(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -50,28 +62,8 @@ public class AlgoKeyUtils {
 		try {
 			return KeyFactory.getInstance(algorithm).generatePrivate(new PKCS8EncodedKeySpec(key));
 		} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-			throw new CryptoRuntimeException(e);
+			throw new RuntimeException(e);
 		}
-	}
-
-	public static IvParameterSpec loadIvp(byte[] padding) {
-		return new IvParameterSpec(padding);
-	}
-
-	public static SecretKey loadKey(String keyAlgorithm, String key) {
-		return loadKey(keyAlgorithm, Base64Utils.decode(key));
-	}
-
-	public static PublicKey loadPublicKey(String algorithm, String key) {
-		return loadPublicKey(algorithm, Base64Utils.decode(key));
-	}
-
-	public static PrivateKey loadPrivateKey(String algorithm, String key) {
-		return loadPrivateKey(algorithm, Base64Utils.decode(key));
-	}
-
-	public static IvParameterSpec loadIvp(String padding) {
-		return loadIvp(padding.getBytes());
 	}
 
 	public static SecretKey generateKey(String algorithm) {
@@ -80,7 +72,7 @@ public class AlgoKeyUtils {
 			kgen.init(new SecureRandom());
 			return kgen.generateKey();
 		} catch (NoSuchAlgorithmException e) {
-			throw new CryptoRuntimeException(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -91,7 +83,7 @@ public class AlgoKeyUtils {
 			kgen.init(keysize);
 			return kgen.generateKey();
 		} catch (NoSuchAlgorithmException e) {
-			throw new CryptoRuntimeException(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -102,7 +94,7 @@ public class AlgoKeyUtils {
 			kgen.init(params);
 			return kgen.generateKey();
 		} catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-			throw new CryptoRuntimeException(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -114,7 +106,7 @@ public class AlgoKeyUtils {
 			kgen.init(params);
 			return kgen.generateKey();
 		} catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-			throw new CryptoRuntimeException(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -124,7 +116,7 @@ public class AlgoKeyUtils {
 			kgen.initialize(keysize, new SecureRandom());
 			return kgen.generateKeyPair();
 		} catch (NoSuchAlgorithmException e) {
-			throw new CryptoRuntimeException(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -134,7 +126,7 @@ public class AlgoKeyUtils {
 			kgen.initialize(params, new SecureRandom());
 			return kgen.generateKeyPair();
 		} catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-			throw new CryptoRuntimeException(e);
+			throw new RuntimeException(e);
 		}
 	}
 

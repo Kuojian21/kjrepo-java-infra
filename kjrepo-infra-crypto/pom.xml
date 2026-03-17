@@ -11,7 +11,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>kjrepo-infra</groupId>
-			<artifactId>kjrepo-infra-common</artifactId>
+			<artifactId>kjrepo-infra-executor</artifactId>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk18on -->
 		<dependency>

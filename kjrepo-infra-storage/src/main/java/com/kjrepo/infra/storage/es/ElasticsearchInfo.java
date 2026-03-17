@@ -7,9 +7,9 @@ import org.elasticsearch.client.RestClient;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.kjrepo.infra.common.executor.PooledInfoDefault;
+import com.kjrepo.infra.executor.pool.AbstractPoolExecutorInfo;
 
-public class ElasticsearchInfo extends PooledInfoDefault<RestClient> {
+public class ElasticsearchInfo extends AbstractPoolExecutorInfo<RestClient> {
 	private List<Map<String, Object>> httpHosts = Lists.newArrayList();
 	private Map<String, Object> requestConfig = Maps.newHashMap();
 	private HttpClientConfig httpClientConfig;

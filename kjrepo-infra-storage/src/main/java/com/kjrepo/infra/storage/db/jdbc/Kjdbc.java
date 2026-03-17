@@ -7,15 +7,13 @@ import java.util.Set;
 import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.springframework.jdbc.UncategorizedSQLException;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.kjrepo.infra.common.logger.LoggerUtils;
-import com.kjrepo.infra.common.utils.StringUtils;
-import com.kjrepo.infra.storage.db.model.KdbDialect;
+import com.kjrepo.infra.common.string.StringSubstitutors;
 import com.kjrepo.infra.storage.db.model.KdbIndex;
 import com.kjrepo.infra.storage.db.model.KdbModel;
 import com.kjrepo.infra.storage.db.model.KdbProperty;
@@ -26,7 +24,7 @@ import com.kjrepo.infra.storage.db.sql.SqlInsertBuilder;
 import com.kjrepo.infra.storage.db.sql.SqlSelectBuilder;
 import com.kjrepo.infra.storage.db.sql.SqlUpdateBuilder;
 import com.kjrepo.infra.storage.db.sql.SqlWhereBuilder;
-import com.kjrepo.infra.storage.db.utils.KdbUtils;
+import com.kjrepo.infra.storage.db.utils.DB_jdbc_utils;
 
 public interface Kjdbc<T> {
 
@@ -61,7 +59,7 @@ public interface Kjdbc<T> {
 			try {
 				return this.insert(SqlBuilder.insert(ignore).model(models));
 			} catch (UncategorizedSQLException e) {
-				if (ignore && KdbUtils.checkIntegrityConstraint(e)) {
+				if (ignore && DB_jdbc_utils.checkIntegrityConstraint(e)) {
 					if (models.size() > 1) {
 						return Stream.of(models).mapToInt(m -> this.insert(m, ignore)).sum();
 					}
@@ -99,11 +97,11 @@ public interface Kjdbc<T> {
 			Object val = en.getValue();
 			if (val instanceof SqlValueExpr) {
 				String expr = ((SqlValueExpr) val).expr();
-				Set<String> cols = StringUtils.extract(expr, SqlValueExpr.INSERT_VALUE_PREFIX,
+				Set<String> cols = StringSubstitutors.vars(expr, SqlValueExpr.INSERT_VALUE_PREFIX,
 						SqlValueExpr.INSERT_VALUE_SUFFIX);
 				return SqlValueExpr.of(
 						StringSubstitutor.replace(expr, Stream.of(cols).collect(Collectors.toMap(col -> col, col -> {
-							switch (dialect()) {
+							switch (this.holder(true).dialect()) {
 							case MySQL:
 								return "values(" + col + ")";
 							case PostgreSQL:
@@ -123,7 +121,7 @@ public interface Kjdbc<T> {
 			try {
 				return this.insert(SqlBuilder.upsert(update1).model(models));
 			} catch (UncategorizedSQLException e) {
-				if (KdbUtils.checkIntegrityConstraint(e)) {
+				if (DB_jdbc_utils.checkIntegrityConstraint(e)) {
 					if (models.size() > 1) {
 						return Stream.of(models).mapToInt(m -> this.upsert(m, update)).sum();
 					}
@@ -133,23 +131,23 @@ public interface Kjdbc<T> {
 						if (val instanceof SqlValueExpr) {
 							String expr = ((SqlValueExpr) val).expr();
 							return SqlValueExpr.of(expr,
-									Stream.of(StringUtils.extract(expr, SqlValueExpr.INSERT_VALUE_PREFIX,
+									Stream.of(StringSubstitutors.vars(expr, SqlValueExpr.INSERT_VALUE_PREFIX,
 											SqlValueExpr.INSERT_VALUE_SUFFIX))
 											.collect(Collectors.toMap(col -> col,
-													col -> model().getProperty(col).readAndCast(m))));
+													col -> model().getProperty(col).value_insert(m))));
 						}
 						return val;
 					}));
 					for (KdbIndex kdbIndex : model().uniIndexes()) {
 						Map<String, Object> params = Stream.of(kdbIndex.columns())
-								.collect(Collectors.toMap(c -> c, c -> model().getProperty(c).readAndCast(m)));
+								.collect(Collectors.toMap(c -> c, c -> model().getProperty(c).value_insert(m)));
 						int rtn = update(update2, params);
 						if (rtn > 0) {
 							return rtn;
 						}
 					}
 					for (KdbProperty p : model().uniProperties()) {
-						Map<String, Object> params = ImmutableMap.of(p.column(), p.readAndCast(m));
+						Map<String, Object> params = ImmutableMap.of(p.column(), p.value_insert(m));
 						int rtn = update(update2, params);
 						if (rtn > 0) {
 							return rtn;
@@ -186,19 +184,21 @@ public interface Kjdbc<T> {
 		return this.select(SqlBuilder.select().where(where));
 	}
 
+	default List<T> select(SqlSelectBuilder sqlBuilder) {
+		return this.select(sqlBuilder, false);
+	}
+
 	int insert(SqlInsertBuilder sqlBuilder);
 
-	List<T> select(SqlSelectBuilder sqlBuilder);
+	List<T> select(SqlSelectBuilder sqlBuilder, boolean master);
 
 	int update(SqlUpdateBuilder sqlBuilder);
 
 	int delete(SqlDeleteBuilder sqlBuilder);
 
-	NamedParameterJdbcOperations jdbcTemplate();
+	KjdbcHolder holder(boolean master);
 
 	KdbModel model();
-
-	KdbDialect dialect();
 
 	String table();
 

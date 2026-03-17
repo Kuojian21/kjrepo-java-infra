@@ -41,8 +41,4 @@ public class LazyConsumer<T> implements Consumer<T> {
 		this.inited = false;
 	}
 
-	public boolean isInited() {
-		return this.inited;
-	}
-
 }

@@ -1,7 +1,6 @@
 package com.kjrepo.infra.runner.mq.rocket;
 
 import java.util.Collections;
-//import java.util.List;
 import java.util.Properties;
 
 import org.apache.rocketmq.client.apis.ClientConfiguration;
@@ -21,7 +20,6 @@ public class RocketRunnerServer extends AbstractRunnerServer<RocketRunner> {
 
 	@Override
 	protected void doRun(RocketRunner runner) {
-//		runners.forEach(runner -> {
 		try {
 			PushConsumer consumer = ClientServiceProvider.loadService().newPushConsumerBuilder()
 					.setClientConfiguration(ConfigUtils
@@ -37,8 +35,6 @@ public class RocketRunnerServer extends AbstractRunnerServer<RocketRunner> {
 		} catch (ClientException e) {
 			logger.error("", e);
 		}
-//		});
-//		return this;
 	}
 
 	public Properties properties(String topic) {

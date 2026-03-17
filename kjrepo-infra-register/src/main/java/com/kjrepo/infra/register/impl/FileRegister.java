@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.io.Files;
 import com.kjrepo.infra.common.file.FileUtils;
 import com.kjrepo.infra.register.AbstractRegister;
-import com.kjrepo.infra.register.utils.DfileUtils;
+import com.kjrepo.infra.register.utils.RegisterUtils;
 import com.kjrepo.infra.text.json.JsonUtils;
 
 public class FileRegister<V> extends AbstractRegister<V> {
@@ -29,10 +29,12 @@ public class FileRegister<V> extends AbstractRegister<V> {
 	@Override
 	public void set(String key, V value) {
 		try {
-			File file = new File(DfileUtils.toFile(this.workspace, key) + File.separator + "main.json");
-			FileUtils.createFileIfNoExists(file, null);
+			File file = new File(RegisterUtils.toFile(this.workspace, key) + File.separator + "main.json");
+//			FileUtils.createFileIfNoExists(file, null);
+			FileUtils.createDirIfNoExists(file.getParentFile());
 			String json = "";
 			if (value == null) {
+
 			} else {
 				json = JsonUtils.toPrettyJson(value);
 			}
@@ -44,12 +46,11 @@ public class FileRegister<V> extends AbstractRegister<V> {
 
 	@Override
 	protected void init(String path) {
-		File file = new File(DfileUtils.toFile(this.workspace, path) + File.separator + "main.json");
+		File file = new File(RegisterUtils.toFile(this.workspace, path) + File.separator + "main.json");
 		FileUtils.createFileIfNoExists(file, null);
-		DfileUtils.monitor(file.getParent(), new FileAlterationListenerAdaptor() {
+		RegisterUtils.monitor(file.getParent(), new FileAlterationListenerAdaptor() {
 			@Override
 			public void onFileChange(final File file) {
-//				logger.info("file change key:{} file:{}", path, file.getName());
 				refresh(path);
 			}
 		});
@@ -58,12 +59,13 @@ public class FileRegister<V> extends AbstractRegister<V> {
 	@Override
 	protected Object json(String path) {
 		try {
-			File file = new File(DfileUtils.toFile(this.workspace, path) + File.separator + "main.json");
+			File file = new File(RegisterUtils.toFile(this.workspace, path) + File.separator + "main.json");
 			String json = StringUtils.join(Files.readLines(file, StandardCharsets.UTF_8), "\n").trim();
 			if (StringUtils.isEmpty(json)) {
 				json = defString();
 			}
-			if (json.startsWith("{") && json.endsWith("}") || json.startsWith("[") && json.endsWith("]")) {
+			if (json != null
+					&& (json.startsWith("{") && json.endsWith("}") || json.startsWith("[") && json.endsWith("]"))) {
 				return JsonUtils.fromJson(json, Object.class);
 			} else {
 				return json;

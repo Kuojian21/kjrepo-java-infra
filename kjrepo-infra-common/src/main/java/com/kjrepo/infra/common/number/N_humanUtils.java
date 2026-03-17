@@ -11,6 +11,25 @@ import com.kjrepo.infra.common.info.Pair;
 
 public class N_humanUtils {
 
+	public static String formatNumber(double d) {
+		return formatNumber(d, 2);
+	}
+
+	public static String formatNumber(double d, int scale) {
+		return format(d, scale, Base.DE.THOU.base);
+	}
+
+	public static String format(double d, int scale, Base base) {
+		for (int i = base.units.size() - 1; i > 0; i--) {
+			if (Math.abs(d) >= base.units.get(i).getValue() * 3) {
+				return BigDecimal.valueOf(d)
+						.divide(BigDecimal.valueOf(base.units.get(i).getValue()), scale, RoundingMode.HALF_UP)
+						.toPlainString() + base.units.get(i).getKey();
+			}
+		}
+		return BigDecimal.valueOf(d).setScale(scale, RoundingMode.HALF_UP) + base.units.get(0).getKey();
+	}
+
 	public static String formatMills(long mills) {
 		return formatMills(mills, 2);
 	}
@@ -52,8 +71,8 @@ public class N_humanUtils {
 	}
 
 	public static String format(long l, int scale, Base base) {
-		for (int i = base.units.size() - 1; i >= 0; i--) {
-			if (l >= base.units.get(i).getValue() * 3) {
+		for (int i = base.units.size() - 1; i > 0; i--) {
+			if (Math.abs(l) >= base.units.get(i).getValue() * 3) {
 				return BigDecimal.valueOf(l)
 						.divide(BigDecimal.valueOf(base.units.get(i).getValue()), scale, RoundingMode.HALF_UP)
 						.toPlainString() + base.units.get(i).getKey();
@@ -86,9 +105,9 @@ public class N_humanUtils {
 			BYTE(new Base(1024, Lists.newArrayList("B", "K", "M", "G"))),
 			MILLI(new Base(new int[] { 1, 1000, 60, 60, 24 }, Lists.newArrayList("ms", "s", "m", "h", "d"))),
 			MICRO(new Base(new int[] { 1, 1000, 1000, 60, 60, 24 },
-					Lists.newArrayList("micros", "ms", "s", "m", "h", "d"))),
+					Lists.newArrayList("mi", "ms", "s", "m", "h", "d"))),
 			NANO(new Base(new int[] { 1, 1000, 1000, 1000, 60, 60, 24 },
-					Lists.newArrayList("nanos", "micros", "ms", "s", "m", "h", "d")));
+					Lists.newArrayList("na", "mi", "ms", "s", "m", "h", "d")));
 
 			private final Base base;
 
@@ -96,18 +115,6 @@ public class N_humanUtils {
 				this.base = base;
 			}
 		}
-
-	}
-
-	public static void main(String[] args) {
-		System.out.println(formatNumber(1000));
-		System.out.println(formatNumber(4000));
-		System.out.println(formatMills(1000));
-		System.out.println(formatMills(4000));
-		System.out.println(formatByte(1000));
-		System.out.println(formatByte(4000));
-		System.out.println(formatNanos(1000));
-		System.out.println(formatNanos(4000));
 	}
 
 }

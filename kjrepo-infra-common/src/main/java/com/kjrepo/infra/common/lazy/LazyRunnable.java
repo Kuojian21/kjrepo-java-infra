@@ -39,7 +39,4 @@ public class LazyRunnable implements Runnable {
 		this.inited = false;
 	}
 
-	public boolean isInited() {
-		return this.inited;
-	}
 }

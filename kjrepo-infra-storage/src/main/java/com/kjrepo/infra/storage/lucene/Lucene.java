@@ -16,16 +16,20 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
+import org.slf4j.Logger;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.kjrepo.infra.common.hook.HookHelper;
 import com.kjrepo.infra.common.lazy.LazySupplier;
-import com.kjrepo.infra.common.term.HookHelper;
+import com.kjrepo.infra.common.logger.LoggerUtils;
 import com.kjrepo.infra.text.json.ConfigUtils;
 
 public class Lucene implements Closeable {
+
+	public static final Logger logger = LoggerUtils.logger(Lucene.class);
 
 	private final LuceneInfo info;
 	private final Executor executor;
@@ -104,12 +108,14 @@ public class Lucene implements Closeable {
 
 	@Override
 	public void close() throws IOException {
-		if (this.manager.isInited()) {
-			this.manager.get().close();
-		}
-		if (this.writer.isInited()) {
-			this.writer.get().close();
-		}
+//		if (this.manager.isInited()) {
+//			this.manager.get().close();
+//		}
+//		if (this.writer.isInited()) {
+//			this.writer.get().close();
+//		}
+		this.manager.refresh(SearcherManager::close);
+		this.writer.refresh(IndexWriter::close);
 	}
 
 }

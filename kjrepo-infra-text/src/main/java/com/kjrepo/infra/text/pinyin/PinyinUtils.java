@@ -3,24 +3,23 @@ package com.kjrepo.infra.text.pinyin;
 import org.apache.commons.lang3.StringUtils;
 
 import com.annimon.stream.Stream;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.google.common.base.Joiner;
 import com.hankcs.hanlp.HanLP;
 import com.kjrepo.infra.common.logger.LoggerUtils;
 
 public class PinyinUtils {
 
-	private static final LoadingCache<String, String> cache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
-		@Override
-		public String load(String key) throws Exception {
-			return StringUtils.join(Stream.of(StringUtils.split(HanLP.convertToPinyinString(key, " ", false), " "))
-					.map(s -> s.substring(0, 1)).toList(), "").toLowerCase();
-		}
-	});
+	public static String abbr(String text) {
+		return Joiner.on("").join(Stream.of(StringUtils.split(pinyin(text, " ", false), " "))
+				.map(s -> s.substring(0, 1)).map(String::toLowerCase).toList());
+	}
 
-	public static String abbr(String str) {
-		return cache.getUnchecked(str);
+	public static String pinyin(String text) {
+		return pinyin(text, "", false);
+	}
+
+	public static String pinyin(String text, String separator, boolean remainNone) {
+		return HanLP.convertToPinyinString(text, separator, remainNone);
 	}
 
 	public static void main(String[] args) {

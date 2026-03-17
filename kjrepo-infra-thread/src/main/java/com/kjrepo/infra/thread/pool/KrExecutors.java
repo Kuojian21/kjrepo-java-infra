@@ -1,6 +1,5 @@
 package com.kjrepo.infra.thread.pool;
 
-import java.lang.reflect.Method;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,8 +11,7 @@ import java.util.concurrent.TimeUnit;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.kjrepo.infra.common.utils.ProxyUtils;
-import com.kjrepo.infra.common.utils.RunUtils;
-import com.kjrepo.infra.thread.utils.KrThread;
+import com.kjrepo.infra.thread.utils.ThreadHelper;
 
 public class KrExecutors {
 
@@ -27,7 +25,7 @@ public class KrExecutors {
 				info.getKeepAliveTime(), //
 				info.getUnit(), //
 				info.getWorkQueue(), //
-				info.getThreadFactory(), //
+				info.getThreadFactory().build(), //
 				info.getRejectedHandler() //
 		);
 		return wrap(executor);
@@ -89,9 +87,6 @@ public class KrExecutors {
 		return wrap(Executors.unconfigurableScheduledExecutorService(executor));
 	}
 
-	private static final Method shutdownBlockingMethod = RunUtils
-			.run(() -> KrExecutorService.class.getDeclaredMethod("shutdownBlocking", new Class<?>[] {}));
-
 	private static KrExecutorService wrap(ExecutorService executor) {
 		return wrap(executor, KrExecutorService.class);
 	}
@@ -102,10 +97,19 @@ public class KrExecutors {
 
 	private static <T extends KrExecutorService> T wrap(ExecutorService executor, Class<T> clazz) {
 		return ProxyUtils.jvm(clazz, (obj, method, args, proxy) -> {
-			if (method.equals(shutdownBlockingMethod)) {
-				executor.shutdown();
-				while (!executor.isTerminated()) {
-					executor.awaitTermination(10, TimeUnit.SECONDS);
+			if (method.getDeclaringClass() == KrExecutorService.class) {
+				switch (method.getName()) {
+				case "close":
+					executor.shutdown();
+					break;
+				case "shutdownBlocking":
+					executor.shutdown();
+					while (!executor.isTerminated()) {
+						executor.awaitTermination(10, TimeUnit.SECONDS);
+					}
+					break;
+				default:
+					throw new RuntimeException("unknow method:" + method.getName() + "!!!");
 				}
 				return null;
 			} else if (method.getDeclaringClass() == Executor.class
@@ -119,7 +123,7 @@ public class KrExecutors {
 				case "schedule":
 				case "scheduleAtFixedRate":
 				case "scheduleWithFixedDelay":
-					return method.invoke(executor, Stream.of(args).map(KrThread::wrap).toArray());
+					return method.invoke(executor, Stream.of(args).map(ThreadHelper::wrap).toArray());
 				default:
 					return method.invoke(executor, args);
 				}

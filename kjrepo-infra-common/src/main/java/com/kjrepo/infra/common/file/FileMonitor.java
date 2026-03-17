@@ -9,8 +9,8 @@ import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 
 import com.google.common.collect.Maps;
+import com.kjrepo.infra.common.hook.HookHelper;
 import com.kjrepo.infra.common.lazy.LazySupplier;
-import com.kjrepo.infra.common.term.HookHelper;
 
 public class FileMonitor {
 

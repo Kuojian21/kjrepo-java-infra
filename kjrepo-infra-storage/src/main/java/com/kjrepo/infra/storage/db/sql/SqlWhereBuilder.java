@@ -116,13 +116,13 @@ public class SqlWhereBuilder extends SqlBuilder {
 			} else if (vObj instanceof Collection<?>) {
 				this.exprs.add(column + " " + opt + "(" + StringUtils.join(Stream.of((Collection<?>) vObj).map(v -> {
 					String var = SqlUtils.var();
-					this.valueMap().put(var, Optional.ofNullable(kdbProperty).map(p -> p.cast(v)).orElse(v));
+					this.valueMap().put(var, Optional.ofNullable(kdbProperty).map(p -> p.value_expr(v)).orElse(v));
 					return ":" + var;
 				}).toList(), ",") + ")");
 			} else {
 				String var = SqlUtils.var();
 				this.exprs.add(column + " " + opt + " :" + var);
-				this.valueMap().put(var, Optional.ofNullable(kdbProperty).map(p -> p.cast(vObj)).orElse(vObj));
+				this.valueMap().put(var, Optional.ofNullable(kdbProperty).map(p -> p.value_expr(vObj)).orElse(vObj));
 			}
 		});
 		return this;

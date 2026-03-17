@@ -39,13 +39,9 @@ public final class SpringBeanFactory {
 		if (applicationContext == null) {
 			synchronized (SpringBeanFactory.class) {
 				if (applicationContext == null) {
-					try {
-						applicationContext = new GenericApplicationContext(
-								new ClassPathXmlApplicationContext("classpath*:spring/*.xml"));
-						applicationContext.refresh();
-					} catch (RuntimeException e) {
-						throw e;
-					}
+					applicationContext = new GenericApplicationContext(
+							new ClassPathXmlApplicationContext("classpath*:spring/*.xml"));
+					applicationContext.refresh();
 				}
 			}
 		}

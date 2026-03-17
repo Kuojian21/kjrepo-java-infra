@@ -5,7 +5,6 @@ import java.net.InetSocketAddress;
 import java.util.List;
 
 import com.annimon.stream.Stream;
-import com.kjrepo.infra.storage.RepositoryRuntimeException;
 import com.kjrepo.infra.storage.spy.SpyInfo;
 import com.kjrepo.infra.text.json.ConfigUtils;
 
@@ -28,7 +27,7 @@ public class SpyUtils {
 		try {
 			return new MemcachedClient(connectionFactoryBuilder.build(), addrs);
 		} catch (IOException e) {
-			throw new RepositoryRuntimeException(e);
+			throw new RuntimeException(e);
 		}
 	}
 

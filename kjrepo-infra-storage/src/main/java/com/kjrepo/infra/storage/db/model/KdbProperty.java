@@ -18,28 +18,38 @@ public class KdbProperty {
 	private final Class<?> type;
 	private final KdbColumn kdbColumn;
 	private final PropertyDescriptor descriptor;
+	private final boolean defInsertTime;
+	private final boolean defUpdateTime;
 
 	public KdbProperty(Field field, PropertyDescriptor descriptor) {
 		this.name = field.getName();
 		this.type = field.getType();
 		this.kdbColumn = field.getAnnotation(KdbColumn.class);
 		this.descriptor = descriptor;
+		this.defInsertTime = field.getAnnotation(KdbInsertTime.class) != null;
+		this.defUpdateTime = field.getAnnotation(KdbUpdateTime.class) != null;
 	}
 
-	public Object readAndCast(Object obj) {
-		return cast(read(obj));
-	}
-
-	public Object read(Object obj) {
+	public Object value_insert(Object obj) {
+		if (this.defInsertTime()) {
+			return System.currentTimeMillis();
+		}
 		try {
-			return this.descriptor.getReadMethod().invoke(obj, new Object[] {});
+			return value_expr(this.descriptor.getReadMethod().invoke(obj, new Object[] {}));
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public Object cast(Object obj) {
-		if (obj instanceof Enum<?>/* this.type.isEnum() */) {
+	public Object value_update(Object obj) {
+		if (this.defUpdateTime()) {
+			return System.currentTimeMillis();
+		}
+		return value_expr(obj);
+	}
+
+	public Object value_expr(Object obj) {
+		if (obj instanceof Enum<?>) {
 			return ((Enum<?>) obj).name();
 		}
 		return obj;
@@ -95,18 +105,12 @@ public class KdbProperty {
 		return "";
 	}
 
-	public boolean defInsert() {
-		if (kdbColumn != null) {
-			return kdbColumn.defInsert();
-		}
-		return false;
+	public boolean defInsertTime() {
+		return this.defInsertTime || this.defUpdateTime;
 	}
 
-	public boolean defUpdate() {
-		if (kdbColumn != null) {
-			return kdbColumn.defUpdate();
-		}
-		return false;
+	public boolean defUpdateTime() {
+		return this.defUpdateTime;
 	}
 
 	public String comment() {

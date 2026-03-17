@@ -1,46 +1,28 @@
 package com.kjrepo.infra.runner.server;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
-import com.kjrepo.infra.common.lazy.LazyRunnable;
 import com.kjrepo.infra.common.lazy.LazySupplier;
 import com.kjrepo.infra.common.logger.LoggerUtils;
 import com.kjrepo.infra.common.term.TermHelper;
 import com.kjrepo.infra.distrib.lock.DLock;
 import com.kjrepo.infra.distrib.lock.context.DLockFactory;
 import com.kjrepo.infra.runner.Runner;
+import com.kjrepo.infra.server.args.ServerArgs;
 
 public abstract class AbstractRunnerServer<R extends Runner> implements RunnerServer<R> {
 
 	protected final Logger logger = LoggerUtils.logger(this.getClass());
 
-	private final AtomicReference<LazySupplier<CommandLine>> commandLine = new AtomicReference<>(
-			LazySupplier.wrap(() -> CommandLine.builder().build()));
+	protected final LazySupplier<CommandLine> commandLine = LazySupplier
+			.wrap(() -> ServerArgs.args().commandLine(this.args_prefix(), this.args_options()));
 
-	private final LazyRunnable initializer = LazyRunnable.wrap(() -> {
-		logger.info("The server [{}] is initializing!!!", AbstractRunnerServer.this.getClass().getSimpleName());
-		this.doInit(commandLine.get().get());
-		logger.info("The server [{}]'s initialization has done!!!",
-				AbstractRunnerServer.this.getClass().getSimpleName());
-	});
-
-	@Override
-	public final RunnerServer<R> init() {
-		this.initializer.run();
-		return this;
-	}
-
-	protected void doInit(CommandLine args) {
-		logger.info("{} be inited!!!", this.getClass().getSimpleName());
-	}
-
-	@Override
-	public final void setCommandLine(LazySupplier<CommandLine> args) {
-		this.commandLine.set(args);
+	protected AbstractRunnerServer() {
+		super();
+		this.init();
 	}
 
 	@Override
@@ -61,6 +43,19 @@ public abstract class AbstractRunnerServer<R extends Runner> implements RunnerSe
 
 		this.doRun(runner);
 		return this;
+	}
+
+	protected void init() {
+
+	}
+
+	protected String args_prefix() {
+		String prefix = this.getClass().getName().replace("." + this.getClass().getSimpleName(), "");
+		return prefix.substring(prefix.lastIndexOf(".") + 1);
+	}
+
+	protected Options args_options() {
+		return new Options();
 	}
 
 	protected abstract void doRun(R runner);

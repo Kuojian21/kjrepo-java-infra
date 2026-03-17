@@ -2,9 +2,9 @@ package com.kjrepo.infra.network.jsch;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.JSchException;
-import com.kjrepo.infra.common.executor.PooledInfoExecutor;
+import com.kjrepo.infra.executor.pool.PoolExecutor;
 
-public abstract class JschBean<B extends Channel, I extends JschBeanInfo<B>> extends PooledInfoExecutor<B, I> {
+public abstract class JschBean<B extends Channel, I extends JschBeanInfo<B>> extends PoolExecutor<B, I> {
 
 	/**
 	 * @com.jcraft.jsch.Channel.getChannel(String)
@@ -30,6 +30,11 @@ public abstract class JschBean<B extends Channel, I extends JschBeanInfo<B>> ext
 	@Override
 	protected final B create() throws Exception {
 		return JschUtils.channel(info(), this.channel);
+	}
+
+	@Override
+	protected String tag() {
+		return this.info().getHost() + "-" + this.channel;
 	}
 
 }

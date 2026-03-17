@@ -27,12 +27,12 @@ public class SqlInsertBuilder extends SqlBuilder {
 				case MySQL:
 					return sql.append("insert ignore into").append(" ").append(table()).append("(")
 							.append(StringUtils.join(Stream.of(model().properties()).filter(p -> !p.identity())
-									.map(p -> p.column()).toList(), " , "))
+									.map(p -> p.column()).toList(), ","))
 							.append(")").append(" values").append(StringUtils.join(this.exprs, ",")).toString();
 				case PostgreSQL:
 					return sql.append("insert into").append(" ").append(table()).append("(")
 							.append(StringUtils.join(Stream.of(model().properties()).filter(p -> !p.identity())
-									.map(p -> p.column()).toList(), " , "))
+									.map(p -> p.column()).toList(), ","))
 							.append(")").append(" values").append(StringUtils.join(this.exprs, ","))
 							.append(" ON CONFLICT DO NOTHING").toString();
 				case H2:
@@ -46,7 +46,7 @@ public class SqlInsertBuilder extends SqlBuilder {
 			return sql.append("insert into").append(" ").append(table()).append("(")
 					.append(StringUtils.join(
 							Stream.of(model().properties()).filter(p -> !p.identity()).map(p -> p.column()).toList(),
-							" , "))
+							","))
 					.append(")").append(" values").append(StringUtils.join(this.exprs, ",")).toString();
 		});
 	}
@@ -73,7 +73,7 @@ public class SqlInsertBuilder extends SqlBuilder {
 			Stream.of(model().properties()).filter(p -> !p.identity()).forEach(p -> {
 				String var = SqlUtils.var();
 				list.add(":" + var);
-				valueMap().put(var, p.readAndCast(model));
+				valueMap().put(var, p.value_insert(model));
 			});
 			exprs.add(new StringBuilder().append("(").append(StringUtils.join(list, ",")).append(")").toString());
 		});

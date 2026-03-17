@@ -10,11 +10,11 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 
 import com.google.common.collect.Lists;
-import com.kjrepo.infra.common.executor.LazyInfoExecutor;
+import com.kjrepo.infra.executor.lazy.LazyExecutor;
 import com.kjrepo.infra.network.mail.MailInfo;
 import com.kjrepo.infra.network.mail.MailUtils;
 
-public class MailSender extends LazyInfoExecutor<Session, MailInfo> {
+public class MailSender extends LazyExecutor<Session, MailInfo> {
 
 	public MailSender(MailInfo info) {
 		super(info, () -> MailUtils.session(info));
@@ -25,19 +25,14 @@ public class MailSender extends LazyInfoExecutor<Session, MailInfo> {
 	}
 
 	public void send(String fromNickname, List<String> to, List<String> cc, List<String> bcc, String subject,
-			String content) throws Exception {
-//		try {
+			String content) throws MessagingException {
 		MimeBodyPart bodyPart = new MimeBodyPart();
 		bodyPart.setContent(content, "text/html;charset=utf-8");
 		send(fromNickname, to, cc, bcc, subject, Lists.newArrayList(bodyPart));
-//		} catch (MessagingException e) {
-//			logger.error("", e);
-//		}
 	}
 
 	public void send(String fromNickname, List<String> to, List<String> cc, List<String> bcc, String subject,
 			List<MimeBodyPart> bodyParts) throws MessagingException {
-//		try {
 		execute(session -> {
 			try {
 				Transport.send(
@@ -45,11 +40,15 @@ public class MailSender extends LazyInfoExecutor<Session, MailInfo> {
 								to, cc, bcc, subject, bodyParts));
 			} catch (UnsupportedEncodingException e) {
 				logger.error("", e);
+				throw new RuntimeException(e);
 			}
 		});
-//		} catch (Exception e) {
-//			logger.error("", e);
-//		}
+	}
+
+	@Override
+	protected String tag() {
+		String username = this.info().getAuth().getUsername();
+		return username.substring(username.indexOf('@') + 1);
 	}
 
 }

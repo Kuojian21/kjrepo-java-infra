@@ -1,42 +1,51 @@
 package com.kjrepo.infra.common.trace;
 
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.Date;
+import java.util.List;
+import java.util.ServiceLoader;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.logging.log4j.ThreadContext;
 import org.slf4j.MDC;
 
+import com.google.common.collect.Lists;
 import com.kjrepo.infra.common.lazy.LazySupplier;
 
 public class TraceIDUtils {
 
-	public static final String ID_REQUEST = "#TRACEID_KJREPO#";
+	public static final String ID_REQUEST = "#TRACEID#";
 	public static final String ID_LOGGER = "TRACEID";
 
 	private static final ThreadLocal<String> TRACEID_HOLDER = new ThreadLocal<>();
-	private static final AtomicLong number = new AtomicLong(0L);
+	private static final TraceIDFactory factory;
+	static {
+		List<TraceIDFactory> factories = Lists.newArrayList(ServiceLoader.load(TraceIDFactory.class));
+		if (factories.size() == 0) {
+			factory = new SimpleTraceIDFactory();
+		} else if (factories.size() == 1) {
+			factory = factories.get(0);
+		} else {
+			throw new RuntimeException("The trace-id-factory's counter is greater than 1!!!");
+		}
+	}
 
 	public static String get() {
 		return TRACEID_HOLDER.get();
 	}
 
-	public static void set(String traceid) {
-		TRACEID_HOLDER.set(traceid);
-		logger(traceid);
+	public static void set(String traceID) {
+		TRACEID_HOLDER.set(traceID);
+		logger(traceID);
 	}
 
 	public static void generate() {
 		generate(null);
 	}
 
-	public static void generate(String traceid) {
-		if (StringUtils.isEmpty(traceid)) {
-			traceid = DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSS-")
-					+ String.format("%04d", number.incrementAndGet() % 10000);
+	public static void generate(String traceID) {
+		if (StringUtils.isEmpty(traceID)) {
+			traceID = factory.generate();
 		}
-		set(traceid);
+		set(traceID);
 	}
 
 	public static void clear() {

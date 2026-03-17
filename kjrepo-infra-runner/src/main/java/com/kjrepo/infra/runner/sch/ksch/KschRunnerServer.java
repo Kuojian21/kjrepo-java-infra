@@ -1,6 +1,5 @@
 package com.kjrepo.infra.runner.sch.ksch;
 
-//import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.annimon.stream.Optional;
@@ -13,7 +12,6 @@ public class KschRunnerServer extends AbstractRunnerServer<KschRunner> {
 
 	@Override
 	protected void doRun(KschRunner runner) {
-//		runners.forEach(runner -> {
 		Thread thread = new Thread(new KschRunnerRunnable(runner));
 		thread.setName(Optional.ofNullable(runner.module()).orElseGet(() -> "ksch-thread-" + number.incrementAndGet()));
 		thread.setDaemon(false);
@@ -22,8 +20,6 @@ public class KschRunnerServer extends AbstractRunnerServer<KschRunner> {
 			thread.interrupt();
 			thread.join();
 		});
-//		});
-//		return this;
 	}
 
 	@Override

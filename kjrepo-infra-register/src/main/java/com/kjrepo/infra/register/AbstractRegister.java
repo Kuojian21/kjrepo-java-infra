@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.slf4j.Logger;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.kjrepo.infra.common.lazy.LazySupplier;
@@ -16,63 +17,50 @@ public abstract class AbstractRegister<V> implements Register<V> {
 
 	protected final Logger logger = LoggerUtils.logger(Register.class);
 
-	private final ConcurrentMap<String, LazySupplier<LazySupplier<V>>> datas = Maps.newConcurrentMap();
-	private final ConcurrentMap<String, Set<RegisterListener<V>>> listeners = Maps.newConcurrentMap();
+	private final ConcurrentMap<String, Data> datas = Maps.newConcurrentMap();
 	private final Class<V> clazz;
 
 	public AbstractRegister(Class<V> clazz) {
-		super();
 		this.clazz = clazz;
 	}
 
 	@Override
-	public V get(String key) {
-		return (V) datas.computeIfAbsent(key, k -> LazySupplier.wrap(() -> {
-			this.init(key);
-			return LazySupplier.wrap(() -> {
-				return ConfigUtils.valueUnchecked(json(key), clazz);
-			});
-		})).get().get();
+	public final V get(String key) {
+		return getData(key).data.get().get();
+	}
+
+	private Data getData(String key) {
+		return datas.computeIfAbsent(key, Data::new);
 	}
 
 	@Override
-	public void addListener(String key, RegisterListener<V> listener) {
-		listeners.computeIfAbsent(key, k -> Sets.newConcurrentHashSet()).add(listener);
-		logger.info("add listener for [{}]!!!", key);
+	public final void addListener(String key, RegisterListener<V> listener) {
+		logger.debug("add listener for [{}]!!!", key);
+		getData(key).listeners.add(listener);
 	}
 
 	protected void refresh(String key) {
-		V o = this.get(key);
-		datas.get(key).get().refresh();
-		V n = this.get(key);
+//		synchronized (getData(key)) {
+		V oData = this.get(key);
+		datas.get(key).data.get().refresh();
+		V nData = this.get(key);
 
 		RegisterEvent<V> event = new RegisterEvent<V>();
 		event.setKey(key);
-		event.setOldData(o);
-		event.setNewData(n);
 
-		this.fireListener(event);
-	}
-
-	protected void fireListener(RegisterEvent<V> event) {
-		logger.info("fireChange key:[{}]!!!", event.getKey());
-		if (event.getOldData() == event.getNewData()) {
-
-		} else if (event.getOldData() == null || event.getNewData() == null) {
-			listeners.computeIfAbsent(event.getKey(), k -> Sets.newConcurrentHashSet())
-					.forEach(listerner -> listerner.onChange(event));
-		} else if (event.getOldData().equals(event.getNewData())) {
+		if (Objects.equal(oData, nData)) {
 
 		} else {
-			listeners.computeIfAbsent(event.getKey(), k -> Sets.newConcurrentHashSet())
-					.forEach(listerner -> listerner.onChange(event));
+			logger.info("fireChange key:[{}]!!!", event.getKey());
+			this.getData(event.getKey()).listeners.forEach(listerner -> listerner.onChange(event));
 		}
+//		}
 	}
 
 	protected String defString() {
 		if (this.clazz.isPrimitive() || Number.class.isAssignableFrom(this.clazz) || this.clazz == Character.class
 				|| this.clazz == Boolean.class || this.clazz == String.class) {
-			return "";
+			return null;
 		} else if (this.clazz.isArray() || List.class.isAssignableFrom(this.clazz)
 				|| Set.class.isAssignableFrom(this.clazz)) {
 			return "[]";
@@ -83,5 +71,23 @@ public abstract class AbstractRegister<V> implements Register<V> {
 	protected abstract void init(String path);
 
 	protected abstract Object json(String path);
+
+	class Data {
+		final Set<RegisterListener<V>> listeners = Sets.newConcurrentHashSet();
+		final String path;
+		final LazySupplier<LazySupplier<V>> data;
+
+		Data(String path) {
+			super();
+			this.path = path;
+			this.data = LazySupplier.wrap(() -> {
+				logger.info("The path:[{}] is initing!!!", path);
+				init(path);
+				return LazySupplier.wrap(() -> {
+					return ConfigUtils.valueUnchecked(json(path), clazz);
+				});
+			});
+		}
+	}
 
 }

@@ -4,10 +4,10 @@ import javax.mail.Store;
 
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
-import com.kjrepo.infra.common.executor.PooledInfo;
+import com.kjrepo.infra.executor.pool.PoolExecutorInfo;
 import com.kjrepo.infra.network.mail.MailInfo;
 
-public class MailReceiverInfo extends MailInfo implements PooledInfo<Store> {
+public class MailReceiverInfo extends MailInfo implements PoolExecutorInfo<Store> {
 	private GenericObjectPoolConfig<Store> poolConfig;
 
 	@Override

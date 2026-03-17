@@ -14,11 +14,11 @@ import org.apache.http.util.EntityUtils;
 
 import com.annimon.stream.Optional;
 import com.google.common.collect.Lists;
-import com.kjrepo.infra.common.executor.LazyInfoExecutor;
 import com.kjrepo.infra.common.info.Pair;
+import com.kjrepo.infra.executor.lazy.LazyExecutor;
 import com.kjrepo.infra.thread.future.MapperFuture;
 
-public class KhttpAsyncClient extends LazyInfoExecutor<CloseableHttpAsyncClient, KhttpAsyncClientInfo> {
+public class KhttpAsyncClient extends LazyExecutor<CloseableHttpAsyncClient, KhttpAsyncClientInfo> {
 
 	public static final KhttpAsyncClient DEFAULT = new KhttpAsyncClient(new KhttpAsyncClientInfo());
 

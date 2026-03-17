@@ -11,7 +11,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>kjrepo-infra</groupId>
-			<artifactId>kjrepo-infra-runner</artifactId>
+			<artifactId>kjrepo-infra-perf</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>kjrepo-infra</groupId>

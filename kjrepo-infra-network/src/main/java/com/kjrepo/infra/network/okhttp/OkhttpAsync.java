@@ -36,8 +36,9 @@ public class OkhttpAsync extends Okhttp {
 
 	public final <T> Future<T> call(Request.Builder builder, ThrowableFunction<Response, T, Exception> handler) {
 		OkhttpAsyncCallback<T> callback = new OkhttpAsyncCallback<T>(handler);
-		execute(client -> {
-			client.newCall(builder.build()).enqueue(callback);
+		Request request = builder.build();
+		super.execute(client -> {
+			client.newCall(request).enqueue(callback);
 		});
 		return callback.getFuture();
 	}

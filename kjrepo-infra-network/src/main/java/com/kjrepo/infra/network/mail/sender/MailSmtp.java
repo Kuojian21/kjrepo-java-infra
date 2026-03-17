@@ -1,17 +1,16 @@
 package com.kjrepo.infra.network.mail.sender;
 
-import java.io.Closeable;
 import java.util.List;
 
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 
 import com.google.common.collect.Lists;
-import com.kjrepo.infra.common.executor.PooledInfoExecutor;
+import com.kjrepo.infra.executor.pool.PoolExecutor;
 import com.kjrepo.infra.network.mail.MailUtils;
 import com.sun.mail.smtp.SMTPTransport;
 
-public class MailSmtp extends PooledInfoExecutor<SMTPTransport, MailSmtpInfo> implements Closeable {
+public class MailSmtp extends PoolExecutor<SMTPTransport, MailSmtpInfo> {
 
 	public void send(String fromNickname, List<String> to, String subject, String content) throws Exception {
 		send(fromNickname, to, null, null, subject, content);
@@ -53,6 +52,12 @@ public class MailSmtp extends PooledInfoExecutor<SMTPTransport, MailSmtpInfo> im
 	@Override
 	public boolean validate(SMTPTransport bean) {
 		return bean.isConnected();
+	}
+
+	@Override
+	protected String tag() {
+		String username = this.info().getAuth().getUsername();
+		return username.substring(username.indexOf('@') + 1);
 	}
 
 }

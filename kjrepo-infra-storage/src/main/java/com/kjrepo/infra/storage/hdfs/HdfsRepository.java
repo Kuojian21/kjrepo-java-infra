@@ -9,9 +9,9 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
-import com.kjrepo.infra.common.executor.LazyInfoExecutor;
+import com.kjrepo.infra.executor.lazy.LazyExecutor;
 
-public class HdfsRepository extends LazyInfoExecutor<FileSystem, Configuration> {
+public class HdfsRepository extends LazyExecutor<FileSystem, Configuration> {
 
 	public HdfsRepository(URI uri, Configuration conf) {
 		super(conf, () -> {
@@ -26,13 +26,13 @@ public class HdfsRepository extends LazyInfoExecutor<FileSystem, Configuration> 
 	public FSDataOutputStream create(Path path, boolean overwrite) throws IOException {
 		return super.execute(resource -> {
 			return resource.create(path, overwrite);
-		});
+		}, new String[] { "create" });
 	}
 
 	public FSDataInputStream open(Path path) throws IOException {
 		return super.execute(resource -> {
 			return resource.open(path);
-		});
+		}, new String[] { "open" });
 	}
 
 }

@@ -6,7 +6,7 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import com.kjrepo.infra.thread.factory.KrThreadFactory;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class KrExecutorServiceInfo {
 
@@ -15,7 +15,7 @@ public class KrExecutorServiceInfo {
 	private long keepAliveTime;
 	private TimeUnit unit;
 	private BlockingQueue<Runnable> workQueue;
-	private KrThreadFactory threadFactory;
+	private ThreadFactoryBuilder threadFactory;
 	private RejectedExecutionHandler rejectedHandler;
 
 	public int getCorePoolSize() {
@@ -58,11 +58,11 @@ public class KrExecutorServiceInfo {
 		this.workQueue = workQueue;
 	}
 
-	public KrThreadFactory getThreadFactory() {
+	public ThreadFactoryBuilder getThreadFactory() {
 		return threadFactory;
 	}
 
-	public void setThreadFactory(KrThreadFactory threadFactory) {
+	public void setThreadFactory(ThreadFactoryBuilder threadFactory) {
 		this.threadFactory = threadFactory;
 	}
 
@@ -90,7 +90,8 @@ public class KrExecutorServiceInfo {
 			this.setWorkQueue(new LinkedBlockingQueue<>());
 		}
 		if (this.getThreadFactory() == null) {
-			this.setThreadFactory(new KrThreadFactory());
+			this.setThreadFactory(new ThreadFactoryBuilder().setNameFormat("pool-%d").setDaemon(false)
+					.setPriority(Thread.NORM_PRIORITY));
 		}
 		if (this.getRejectedHandler() == null) {
 			this.setRejectedHandler(new ThreadPoolExecutor.CallerRunsPolicy());

@@ -2,6 +2,8 @@ package com.kjrepo.infra.perf;
 
 import java.util.concurrent.TimeUnit;
 
+import com.kjrepo.infra.perf.model.PerfLogTag;
+
 public class PerfContext {
 
 	private final PerfLogger perfLogger;

@@ -1,42 +1,53 @@
 package com.kjrepo.infra.perf;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-import com.github.phantomthief.collection.BufferTrigger;
-import com.google.common.collect.Lists;
+import com.annimon.stream.Stream;
 import com.google.common.collect.Maps;
-import com.kjrepo.infra.buffer.trigger.BufferTriggerBuilder;
+import com.kjrepo.infra.buffer.trigger.BufferTrigger;
+import com.kjrepo.infra.common.hook.HookHelper;
+import com.kjrepo.infra.common.info.Pair;
+import com.kjrepo.infra.common.spi.PkgSpiFactory;
+import com.kjrepo.infra.perf.handler.IPerfHandler;
+import com.kjrepo.infra.perf.model.PerfLogHolder;
+import com.kjrepo.infra.perf.model.PerfLogMetrics;
+import com.kjrepo.infra.perf.model.PerfLogTag;
 
 public class PerfLogger {
 
-	private final BufferTrigger<PerfContext> bufferTrigger = BufferTriggerBuilder
-			.<PerfContext, Map<PerfLogTag, PerfLogMetrics>>simple() //
-			.consumer(this::handle) //
-			.setContainer(Maps::newConcurrentMap, (container, builder) -> {
-				container.merge(builder.getPerfLog(), new PerfLogMetrics(builder.getCount(), builder.getMicro()),
-						(value1, value2) -> {
-							value1.accept(value2.getCount(), value2.getMicro());
-							return value1;
-						});
-				return true;
-			}).build();
+	private final PkgSpiFactory<IPerfHandler> spi = PkgSpiFactory.of(IPerfHandler.class);
+	private final BufferTrigger<PerfContext> bufferTrigger;
 
-	private final List<PerfHandler> handlers;
-
-	public PerfLogger(List<PerfHandler> handlers) {
+	public PerfLogger() {
 		super();
-		this.handlers = Collections.unmodifiableList(Lists.newArrayList(handlers));
+		this.bufferTrigger = BufferTrigger.<PerfContext, Map<PerfLogTag, PerfLogMetrics>>simple() //
+				.setContainer(Maps::newConcurrentMap, (container, builder) -> {
+					container.merge(builder.getPerfLog(), new PerfLogMetrics(builder.getCount(), builder.getMicro()),
+							(value1, value2) -> {
+								value1.accept(value2.getTotalCount(), value2.getTotalMicro());
+								return value1;
+							});
+				}) //
+				.setConsumer(this::handle) //
+				.setInterval(1, TimeUnit.MINUTES) //
+				.disableEnqueueLock() //
+				.build();
+		HookHelper.addHook("perf", () -> {
+			this.bufferTrigger.manuallyDoTrigger();
+		});
 	}
 
 	public void logstash(PerfContext builder) {
-		bufferTrigger.enqueue(builder);
+		this.bufferTrigger.enqueue(builder);
 	}
 
 	protected void handle(Map<PerfLogTag, PerfLogMetrics> perfs) {
-		handlers.forEach(handler -> {
-			handler.handle(perfs);
-		});
+		Stream.of(perfs).map(e -> PerfLogHolder.of(e.getKey(), e.getValue())).flatMap(holder -> Stream
+				.of(spi.getList(holder.getTag().getNamespace())).map(handler -> Pair.pair(handler, holder)))
+				.groupBy(Pair::getKey).forEach(entry -> {
+					entry.getKey().handle(Stream.of(entry.getValue()).map(Pair::getValue).toList());
+				});
 	}
+
 }

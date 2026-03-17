@@ -2,7 +2,6 @@ package com.kjrepo.infra.runner.sch.quatz;
 
 import java.io.IOException;
 import java.io.InputStream;
-//import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -15,9 +14,7 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
-//import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.spi.MutableTrigger;
-//import org.springframework.stereotype.Service;
 
 import com.annimon.stream.Optional;
 import com.kjrepo.infra.common.lazy.LazySupplier;
@@ -49,7 +46,6 @@ public class QuatzRunnerServer extends AbstractRunnerServer<QuatzRunner> {
 
 	@Override
 	protected void doRun(QuatzRunner runner) {
-//		runners.forEach(runner -> {
 		for (int i = 0; i < runner.crons().length; i++) {
 			try {
 				String jobID = Optional.ofNullable(runner.ID()).filter(id -> StringUtils.isNotEmpty(id))
@@ -63,8 +59,6 @@ public class QuatzRunnerServer extends AbstractRunnerServer<QuatzRunner> {
 				logger.error("", e);
 			}
 		}
-//		});
-//		return this;
 	}
 
 	public Properties properties() {

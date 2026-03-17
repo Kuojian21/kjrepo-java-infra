@@ -3,9 +3,9 @@ package com.kjrepo.infra.network.jsch;
 import java.util.Properties;
 
 import com.jcraft.jsch.Channel;
-import com.kjrepo.infra.common.executor.PooledInfoDefault;
+import com.kjrepo.infra.executor.pool.AbstractPoolExecutorInfo;
 
-public class JschBeanInfo<B extends Channel> extends PooledInfoDefault<B> {
+public class JschBeanInfo<B extends Channel> extends AbstractPoolExecutorInfo<B> {
 
 	private String host;
 	private int port;

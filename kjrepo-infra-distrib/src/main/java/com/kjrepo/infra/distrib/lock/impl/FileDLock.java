@@ -11,7 +11,7 @@ import com.kjrepo.infra.common.file.FileUtils;
 import com.kjrepo.infra.common.info.Tuple;
 import com.kjrepo.infra.common.info.Tuple3;
 import com.kjrepo.infra.distrib.lock.AbstractDLock;
-import com.kjrepo.infra.register.utils.DfileUtils;
+import com.kjrepo.infra.register.utils.RegisterUtils;
 
 public class FileDLock extends AbstractDLock {
 
@@ -27,7 +27,7 @@ public class FileDLock extends AbstractDLock {
 	public FileDLock(String key, String workspace) {
 		super(key);
 		this.workspace = workspace;
-		this.file = new File(DfileUtils.toFile(this.workspace, key()) + File.separator + "lock.json");
+		this.file = new File(RegisterUtils.toFile(this.workspace, key()) + File.separator + "lock.json");
 		FileUtils.createFileIfNoExists(file, "DLock");
 	}
 

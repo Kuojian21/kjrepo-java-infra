@@ -5,7 +5,7 @@ import java.util.List;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import com.kjrepo.infra.common.executor.LazyInfoExecutor;
+import com.kjrepo.infra.executor.lazy.LazyExecutor;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCursor;
@@ -13,7 +13,7 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertManyResult;
 import com.mongodb.client.result.UpdateResult;
 
-public class MongoRepository extends LazyInfoExecutor<MongoClient, MongoInfo> {
+public class MongoRepository extends LazyExecutor<MongoClient, MongoInfo> {
 
 	public MongoRepository(MongoInfo info) {
 		super(info, () -> MongoClients.create(info.getClientSettings(), info.getDriverInformation()));

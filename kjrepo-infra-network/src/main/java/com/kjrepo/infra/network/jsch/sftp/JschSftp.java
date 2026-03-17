@@ -31,7 +31,7 @@ public class JschSftp extends JschBean<ChannelSftp, JschSftpInfo> {
 			} finally {
 				sftp.cd(pwd);
 			}
-		});
+		}, "upload");
 	}
 
 	public void download(String sftpPath, String sftpFile, OutputStream outputStream) throws Exception {
@@ -44,7 +44,7 @@ public class JschSftp extends JschBean<ChannelSftp, JschSftpInfo> {
 			} finally {
 				sftp.cd(pwd);
 			}
-		});
+		}, "download");
 	}
 
 }

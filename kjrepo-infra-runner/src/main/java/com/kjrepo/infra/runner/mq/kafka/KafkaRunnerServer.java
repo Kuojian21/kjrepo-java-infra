@@ -1,7 +1,6 @@
 package com.kjrepo.infra.runner.mq.kafka;
 
 import java.time.Duration;
-//import java.util.List;
 import java.util.Properties;
 
 import org.apache.kafka.clients.CommonClientConfigs;
@@ -22,7 +21,6 @@ public class KafkaRunnerServer extends AbstractRunnerServer<KafkaRunner> {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void doRun(KafkaRunner runner) {
-//		runners.forEach(runner -> {
 		Properties properties = properties(runner.topic());
 		properties.setProperty(CommonClientConfigs.GROUP_ID_CONFIG, runner.consumerGroup());
 		KafkaConsumer<?, ?> consumer = new KafkaConsumer<>(properties);
@@ -47,8 +45,6 @@ public class KafkaRunnerServer extends AbstractRunnerServer<KafkaRunner> {
 				consumer.close();
 			}
 		}
-//		});
-//		return this;
 	}
 
 	@SuppressWarnings("unchecked")

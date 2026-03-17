@@ -56,7 +56,7 @@ public class TypeMapperUtils {
 		Type[] varis = rawType.getTypeParameters();
 		Type[] types = superType.getActualTypeArguments();
 		mapper.put(rawType, IntStream.range(0, types.length).mapToObj(i -> i)
-				.collect(Collectors.toMap(i -> varis[i], i -> mapper(mapper, type, types[i]))));
+				.collect(Collectors.toMap(i -> varis[i], i -> mapper(mapper, type, types[i]), Maps::newLinkedHashMap)));
 		mapper(rawType, rawType.getGenericSuperclass(), mapper);
 		Stream.ofNullable(rawType.getGenericInterfaces()).forEach(i -> mapper(rawType, i, mapper));
 		return mapper;

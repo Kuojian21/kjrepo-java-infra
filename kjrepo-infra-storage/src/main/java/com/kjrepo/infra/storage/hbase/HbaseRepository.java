@@ -21,9 +21,9 @@ import org.apache.hadoop.hbase.client.TableDescriptorBuilder;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import com.google.common.collect.Lists;
-import com.kjrepo.infra.common.executor.LazyInfoExecutor;
+import com.kjrepo.infra.executor.lazy.LazyExecutor;
 
-public class HbaseRepository extends LazyInfoExecutor<Connection, Configuration> {
+public class HbaseRepository extends LazyExecutor<Connection, Configuration> {
 
 	public HbaseRepository(Configuration config) {
 		super(config, () -> {
@@ -44,7 +44,7 @@ public class HbaseRepository extends LazyInfoExecutor<Connection, Configuration>
 				});
 				admin.createTable(builder.build());
 			}
-		});
+		}, new String[] { "create", table });
 
 	}
 
@@ -53,7 +53,7 @@ public class HbaseRepository extends LazyInfoExecutor<Connection, Configuration>
 			try (Admin admin = resource.getAdmin()) {
 				admin.disableTable(TableName.valueOf(table));
 			}
-		});
+		}, new String[] { "disable", table });
 	}
 
 	public void truncate(String table) throws IOException {
@@ -61,7 +61,7 @@ public class HbaseRepository extends LazyInfoExecutor<Connection, Configuration>
 			try (Admin admin = resource.getAdmin()) {
 				admin.truncateTable(TableName.valueOf(table), true);
 			}
-		});
+		}, new String[] { "truncate", table });
 	}
 
 	public void delete(String table) throws IOException {
@@ -69,7 +69,7 @@ public class HbaseRepository extends LazyInfoExecutor<Connection, Configuration>
 			try (Admin admin = resource.getAdmin()) {
 				admin.deleteTable(TableName.valueOf(table));
 			}
-		});
+		}, new String[] { "delete", table });
 
 	}
 
@@ -78,7 +78,7 @@ public class HbaseRepository extends LazyInfoExecutor<Connection, Configuration>
 			try (Table table = resource.getTable(TableName.valueOf(tablename))) {
 				table.put(puts);
 			}
-		});
+		}, new String[] { "put", tablename });
 	}
 
 	public void put(String tablename, String rowId, List<Cell> cells) throws IOException {
@@ -95,7 +95,7 @@ public class HbaseRepository extends LazyInfoExecutor<Connection, Configuration>
 			try (Table table = resource.getTable(TableName.valueOf(tablename))) {
 				return table.get(gets);
 			}
-		});
+		}, new String[] { "get", tablename });
 	}
 
 	public Result get(String tablename, String rowID) throws IOException {
@@ -109,7 +109,7 @@ public class HbaseRepository extends LazyInfoExecutor<Connection, Configuration>
 			try (Table table = resource.getTable(TableName.valueOf(tablename))) {
 				table.delete(deletes);
 			}
-		});
+		}, new String[] { "delete", tablename });
 	}
 
 	public void delete(String tablename, String rowID) throws IOException {
@@ -122,7 +122,7 @@ public class HbaseRepository extends LazyInfoExecutor<Connection, Configuration>
 			try (Table table = resource.getTable(TableName.valueOf(tablename))) {
 				return table.getScanner(scan);
 			}
-		});
+		}, new String[] { "scan", tablename });
 	}
 
 }

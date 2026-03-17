@@ -5,9 +5,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.net.ftp.FTPClient;
-import com.kjrepo.infra.common.executor.PooledInfoExecutor;
 
-public abstract class KftpBean<B extends FTPClient, I extends KftpBeanInfo<B>> extends PooledInfoExecutor<B, I> {
+import com.kjrepo.infra.executor.pool.PoolExecutor;
+
+public abstract class KftpBean<B extends FTPClient, I extends KftpBeanInfo<B>> extends PoolExecutor<B, I> {
 
 	public KftpBean(I info) {
 		super(info);
@@ -22,7 +23,7 @@ public abstract class KftpBean<B extends FTPClient, I extends KftpBeanInfo<B>> e
 				client.changeWorkingDirectory(ftpPath);
 			}
 			return client.storeFile(ftpFile, inputStream);
-		});
+		}, "upload");
 	}
 
 	public final boolean download(String ftpPath, String ftpFile, OutputStream outputStream) throws IOException {
@@ -38,7 +39,7 @@ public abstract class KftpBean<B extends FTPClient, I extends KftpBeanInfo<B>> e
 				return true;
 			}
 			return false;
-		});
+		}, "download");
 	}
 
 	static final ThreadLocal<String> DIR = new ThreadLocal<>();
@@ -67,5 +68,10 @@ public abstract class KftpBean<B extends FTPClient, I extends KftpBeanInfo<B>> e
 	@Override
 	public void destroy(B bean) throws IOException {
 		bean.disconnect();
+	}
+
+	@Override
+	protected String tag() {
+		return info().getHostname();
 	}
 }

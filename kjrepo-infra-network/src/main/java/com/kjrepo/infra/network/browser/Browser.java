@@ -1,9 +1,10 @@
 package com.kjrepo.infra.network.browser;
 
 import org.htmlunit.WebClient;
-import com.kjrepo.infra.common.executor.PooledInfoExecutor;
 
-public class Browser extends PooledInfoExecutor<WebClient, BrowserInfo> {
+import com.kjrepo.infra.executor.pool.PoolExecutor;
+
+public class Browser extends PoolExecutor<WebClient, BrowserInfo> {
 
 	public Browser(BrowserInfo info) {
 		super(info);

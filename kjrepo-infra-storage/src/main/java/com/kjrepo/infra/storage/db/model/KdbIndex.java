@@ -1,17 +1,18 @@
 package com.kjrepo.infra.storage.db.model;
 
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({})
-@Retention(RUNTIME)
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface KdbIndex {
 
 	String name() default "";
 
 	String[] columns();
 
-	KdbIndexType type() default KdbIndexType.INDEX;
+	KdbIndexType type() default KdbIndexType.IND;
 
 }

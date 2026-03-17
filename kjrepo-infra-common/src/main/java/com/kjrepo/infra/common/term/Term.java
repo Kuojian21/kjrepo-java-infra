@@ -1,6 +1,6 @@
 package com.kjrepo.infra.common.term;
 
-import com.github.phantomthief.util.ThrowableRunnable;
+import com.kjrepo.infra.common.function.ThrowableRunnable;
 
 public class Term {
 	private final String module;

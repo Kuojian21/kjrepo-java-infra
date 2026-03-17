@@ -6,8 +6,6 @@ import java.util.function.Function;
 
 import org.apache.commons.pool2.ObjectPool;
 
-import com.kjrepo.infra.storage.RepositoryRuntimeException;
-
 public class ResourceUtils {
 
 	public static <R extends Closeable> void execute(R resource, Consumer<R> consumer) {
@@ -21,7 +19,7 @@ public class ResourceUtils {
 		try (AutoCloseable closeable = resource) {
 			return func.apply(resource);
 		} catch (Exception e) {
-			throw new RepositoryRuntimeException(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -41,7 +39,7 @@ public class ResourceUtils {
 				pool.returnObject(resource);
 			}
 		} catch (Exception e) {
-			throw new RepositoryRuntimeException(e);
+			throw new RuntimeException(e);
 		}
 	}
 

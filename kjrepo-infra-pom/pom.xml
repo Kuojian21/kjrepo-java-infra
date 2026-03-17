@@ -13,7 +13,15 @@
 	<dependencies>
 		<dependency>
 			<groupId>kjrepo-infra</groupId>
+			<artifactId>kjrepo-infra-buffer</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>kjrepo-infra</groupId>
 			<artifactId>kjrepo-infra-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>kjrepo-infra</groupId>
+			<artifactId>kjrepo-infra-cluster</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>kjrepo-infra</groupId>
@@ -35,23 +43,7 @@
 		</dependency>
 		<dependency>
 			<groupId>kjrepo-infra</groupId>
-			<artifactId>kjrepo-infra-runner</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>kjrepo-infra</groupId>
-			<artifactId>kjrepo-infra-script</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>kjrepo-infra</groupId>
-			<artifactId>kjrepo-infra-storage</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>kjrepo-infra</groupId>
-			<artifactId>kjrepo-infra-text</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>kjrepo-infra</groupId>
-			<artifactId>kjrepo-infra-trace</artifactId>
+			<artifactId>kjrepo-infra-executor</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>kjrepo-infra</groupId>
@@ -63,23 +55,35 @@
 		</dependency>
 		<dependency>
 			<groupId>kjrepo-infra</groupId>
-			<artifactId>kjrepo-infra-thread</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>kjrepo-infra</groupId>
-			<artifactId>kjrepo-infra-cluster</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>kjrepo-infra</groupId>
 			<artifactId>kjrepo-infra-register</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>kjrepo-infra</groupId>
-			<artifactId>kjrepo-infra-buffer</artifactId>
+			<artifactId>kjrepo-infra-runner</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>kjrepo-infra</groupId>
+			<artifactId>kjrepo-infra-script</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>kjrepo-infra</groupId>
 			<artifactId>kjrepo-infra-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>kjrepo-infra</groupId>
+			<artifactId>kjrepo-infra-storage</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>kjrepo-infra</groupId>
+			<artifactId>kjrepo-infra-text</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>kjrepo-infra</groupId>
+			<artifactId>kjrepo-infra-thread</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>kjrepo-infra</groupId>
+			<artifactId>kjrepo-infra-trace</artifactId>
 		</dependency>
 	</dependencies>
 </project>

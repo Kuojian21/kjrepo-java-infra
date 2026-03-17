@@ -10,7 +10,11 @@ import net.sf.cglib.proxy.MethodInterceptor;
 public class ProxyUtils {
 
 	public static <T> T proxy(Class<T> clazz, MethodInterceptor handler) {
-		return jvm(clazz, handler);
+		if (clazz.isInterface()) {
+			return jvm(clazz, handler);
+		} else {
+			return cglib(clazz, handler);
+		}
 	}
 
 	@SuppressWarnings("unchecked")

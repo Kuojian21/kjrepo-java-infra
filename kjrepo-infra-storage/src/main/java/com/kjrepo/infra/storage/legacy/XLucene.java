@@ -19,15 +19,15 @@ import org.slf4j.Logger;
 
 import com.annimon.stream.Stream;
 import com.google.common.collect.Lists;
+import com.kjrepo.infra.common.hook.HookHelper;
 import com.kjrepo.infra.common.lazy.LazySupplier;
 import com.kjrepo.infra.common.logger.LoggerUtils;
-import com.kjrepo.infra.common.term.HookHelper;
 import com.kjrepo.infra.common.utils.StackUtils;
 import com.kjrepo.infra.register.context.RegisterFactory;
 
 public class XLucene implements Closeable {
 
-	private final Logger logger = LoggerUtils.logger(getClass());
+	public final Logger logger = LoggerUtils.logger(getClass());
 	private final LazySupplier<IndexWriter> writer;
 	private final LazySupplier<LazySupplier<IndexSearcher>> searcher;
 	private final String key;
@@ -58,20 +58,22 @@ public class XLucene implements Closeable {
 			});
 			RegisterFactory.getContext(StackUtils.firstBusinessInvokerClassname()).getRegister(Long.class)
 					.addListener(key, e -> {
-						if (is.isInited()) {
-							IndexSearcher ois = is.get();
-							is.refresh();
-							try {
-								ois.getIndexReader().close();
-							} catch (IOException e1) {
-								logger.error("", e1);
-							}
-						}
+//						if (is.isInited()) {
+//							IndexSearcher ois = is.get();
+//							is.refresh();
+//							try {
+//								ois.getIndexReader().close();
+//							} catch (IOException e1) {
+//								logger.error("", e1);
+//							}
+//						}
+						is.refresh(bean -> bean.getIndexReader().close());
 					});
 			HookHelper.addHook("lucene", () -> {
-				if (is.isInited()) {
-					is.get().getIndexReader().close();
-				}
+//				if (is.isInited()) {
+//					is.get().getIndexReader().close();
+//				}
+				is.refresh(bean -> bean.getIndexReader().close());
 			});
 			return is;
 		});
@@ -106,12 +108,14 @@ public class XLucene implements Closeable {
 
 	@Override
 	public void close() throws IOException {
-		if (this.searcher.isInited()) {
-			this.searcher.get().get().getIndexReader().close();
-		}
-		if (this.writer.isInited()) {
-			this.writer.get().close();
-		}
+//		if (this.searcher.isInited()) {
+//			this.searcher.get().get().getIndexReader().close();
+//		}
+//		if (this.writer.isInited()) {
+//			this.writer.get().close();
+//		}
+		this.searcher.refresh(bean -> bean.refresh(b -> b.getIndexReader().close()));
+		this.writer.refresh(bean -> bean.close());
 	}
 
 }

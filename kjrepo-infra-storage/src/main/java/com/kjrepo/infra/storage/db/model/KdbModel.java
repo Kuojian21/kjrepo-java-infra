@@ -56,6 +56,10 @@ public class KdbModel {
 		return uniProperties.get();
 	}
 
+	public List<KdbProperty> updateProperties() {
+		return updateProperties;
+	}
+
 	private static Map<String, PropertyDescriptor> descriptors(Class<?> clazz, Map<String, PropertyDescriptor> map) {
 		if (clazz == Object.class) {
 			return map;
@@ -91,6 +95,7 @@ public class KdbModel {
 	private final Map<String, KdbProperty> propertyMap;
 	private final LazySupplier<List<KdbIndex>> uniIndexes;
 	private final LazySupplier<List<KdbProperty>> uniProperties;
+	private final List<KdbProperty> updateProperties;
 
 	public KdbModel(Class<?> clazz) {
 		this.name = clazz.getSimpleName();
@@ -106,7 +111,7 @@ public class KdbModel {
 				return Lists.newArrayList();
 			} else {
 				return Stream.ofNullable(kdbTable.indexes())
-						.filter(i -> i.type() == KdbIndexType.PRIMARY || i.type() == KdbIndexType.UNIQUE)
+						.filter(i -> i.type() == KdbIndexType.PRI || i.type() == KdbIndexType.UNI)
 						.filter(i -> Stream.of(i.columns()).map(c -> this.getProperty(c)).allMatch(p -> !p.identity()))
 						.toList();
 
@@ -115,5 +120,6 @@ public class KdbModel {
 		this.uniProperties = LazySupplier.wrap(() -> {
 			return Stream.of(this.properties()).filter(p -> !p.identity() && (p.primary() || p.unique())).toList();
 		});
+		this.updateProperties = Stream.of(propertyList).filter(KdbProperty::defUpdateTime).toList();
 	}
 }

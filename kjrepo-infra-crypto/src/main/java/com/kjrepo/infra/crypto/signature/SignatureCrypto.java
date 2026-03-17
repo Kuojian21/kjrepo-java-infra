@@ -1,17 +1,19 @@
 package com.kjrepo.infra.crypto.signature;
 
 import java.security.Signature;
-//import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import com.kjrepo.infra.common.executor.PooledInfoExecutor;
+import java.util.List;
 
-public abstract class SignatureCrypto extends PooledInfoExecutor<Signature, SignatureInfo> {
+import com.kjrepo.infra.crypto.Crypto;
+
+public abstract class SignatureCrypto extends Crypto<Signature, SignatureInfo> {
 
 	public SignatureCrypto(SignatureInfo info) {
 		super(info);
 	}
 
-//	public SignatureCrypto(SignatureInfo info, GenericObjectPoolConfig<Signature> poolConfig) {
-//		super(info, poolConfig);
-//	}
+	@Override
+	protected byte[] crypt(List<byte[]> datas) throws Exception {
+		throw new RuntimeException("unsupported!!!");
+	}
 
 }

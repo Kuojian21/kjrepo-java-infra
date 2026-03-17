@@ -43,7 +43,4 @@ public class LazyFunction<T, R> implements Function<T, R> {
 		this.inited = false;
 	}
 
-	public boolean isInited() {
-		return this.inited;
-	}
 }

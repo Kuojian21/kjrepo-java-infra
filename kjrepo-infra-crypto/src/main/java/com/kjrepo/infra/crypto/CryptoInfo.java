@@ -1,8 +1,8 @@
 package com.kjrepo.infra.crypto;
 
-import com.kjrepo.infra.common.executor.PooledInfoDefault;
+import com.kjrepo.infra.executor.pool.AbstractPoolExecutorInfo;
 
-public class CryptoInfo<T> extends PooledInfoDefault<T> {
+public class CryptoInfo<T> extends AbstractPoolExecutorInfo<T> {
 
 	private String algorithm;
 

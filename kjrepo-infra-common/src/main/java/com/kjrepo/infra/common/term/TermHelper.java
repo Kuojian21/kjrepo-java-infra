@@ -9,9 +9,9 @@ import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 
 import com.annimon.stream.function.Function;
-import com.github.phantomthief.util.ThrowableRunnable;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Sets;
+import com.kjrepo.infra.common.function.ThrowableRunnable;
 import com.kjrepo.infra.common.logger.LoggerUtils;
 import com.kjrepo.infra.common.number.N_humanUtils;
 import com.kjrepo.infra.common.trace.TraceIDUtils;

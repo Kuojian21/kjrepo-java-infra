@@ -10,11 +10,8 @@ import com.kjrepo.infra.storage.db.dialect.H2Dialect;
 import com.kjrepo.infra.storage.db.dialect.SqliteDialect;
 
 public enum KdbDialect {
-	H2("H2", new H2Dialect()),
-	Sqlite("SQLite", new SqliteDialect()),
-	MySQL("MySQL", new MySQLDialect()),
-	PostgreSQL("PostgreSQL", new PostgreSQLDialect()),
-	SQLServer("SQL Server", new SQLServerDialect()),
+	H2("H2", new H2Dialect()), Sqlite("SQLite", new SqliteDialect()), MySQL("MySQL", new MySQLDialect()),
+	PostgreSQL("PostgreSQL", new PostgreSQLDialect()), SQLServer("SQL Server", new SQLServerDialect()),
 	Oracle("Oracle", new OracleDialect());
 
 	private final String mark;

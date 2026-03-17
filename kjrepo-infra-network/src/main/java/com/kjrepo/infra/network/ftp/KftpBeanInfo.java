@@ -1,8 +1,8 @@
 package com.kjrepo.infra.network.ftp;
 
-import com.kjrepo.infra.common.executor.PooledInfoDefault;
+import com.kjrepo.infra.executor.pool.AbstractPoolExecutorInfo;
 
-public class KftpBeanInfo<T> extends PooledInfoDefault<T> {
+public class KftpBeanInfo<T> extends AbstractPoolExecutorInfo<T> {
 	private String hostname;
 	private int port;
 	private String username;

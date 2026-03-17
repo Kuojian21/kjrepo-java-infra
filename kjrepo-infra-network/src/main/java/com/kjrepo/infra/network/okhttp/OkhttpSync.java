@@ -1,5 +1,6 @@
 package com.kjrepo.infra.network.okhttp;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.annimon.stream.Optional;
@@ -21,11 +22,12 @@ public class OkhttpSync extends Okhttp {
 		super(info);
 	}
 
-	public String json(String url, String method, List<Pair<String, String>> headers, String json) {
+	public String json(String url, String method, List<Pair<String, String>> headers, String json) throws IOException {
 		return call(url, method, headers, RequestBody.create(MediaType.get("application/json; charset=utf-8"), json));
 	}
 
-	public String call(String url, String method, List<Pair<String, String>> headers, RequestBody body) {
+	public <X extends Throwable> String call(String url, String method, List<Pair<String, String>> headers,
+			RequestBody body) throws IOException {
 		Request.Builder builder = new Request.Builder().url(url);
 		builder.method(method, body);
 		Optional.ofNullable(headers).orElseGet(() -> Lists.newArrayList()).forEach(p -> {
@@ -34,15 +36,18 @@ public class OkhttpSync extends Okhttp {
 		return call(builder, response -> response.body().string());
 	}
 
-	public final <T> T call(Request.Builder builder, ThrowableFunction<Response, T, Throwable> handler) {
+	@SuppressWarnings("unchecked")
+	public final <T, X extends Throwable> T call(Request.Builder builder, ThrowableFunction<Response, T, X> handler)
+			throws X {
 		Response response = null;
 		try {
+			Request request = builder.build();
 			response = execute(client -> {
-				return client.newCall(builder.build()).execute();
-			});
+				return client.newCall(request).execute();
+			}, request.url().host());
 			return handler.apply(response);
 		} catch (Throwable e) {
-			throw new RuntimeException(e);
+			throw (X) e;
 		} finally {
 			if (response != null) {
 				Util.closeQuietly(response);

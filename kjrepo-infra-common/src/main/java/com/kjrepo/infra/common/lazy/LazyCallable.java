@@ -29,12 +29,8 @@ public class LazyCallable<T> implements Callable<T> {
 		return this.value;
 	}
 
-	public void refresh() {
+	public synchronized void refresh() {
 		this.inited = false;
-	}
-
-	public boolean isInited() {
-		return this.inited;
 	}
 
 }

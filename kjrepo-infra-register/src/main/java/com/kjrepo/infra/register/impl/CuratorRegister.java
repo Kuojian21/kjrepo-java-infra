@@ -55,9 +55,14 @@ public class CuratorRegister<V> extends AbstractRegister<V> {
 
 	@Override
 	protected Object json(String path) {
-		return JsonUtils.fromJson(caches
-				.computeIfAbsent(path, k -> LazySupplier.wrap(() -> CuratorCache.build(this.curator, path))).get()
-				.get(path).map(data -> new String(data.getData(), StandardCharsets.UTF_8)).orElse(super.defString()),
-				Object.class);
+		String json = caches.computeIfAbsent(path, k -> LazySupplier.wrap(() -> CuratorCache.build(this.curator, path)))
+				.get().get(path).map(data -> new String(data.getData(), StandardCharsets.UTF_8))
+				.orElse(super.defString());
+		if (json != null
+				&& (json.startsWith("{") && json.endsWith("}") || json.startsWith("[") && json.endsWith("]"))) {
+			return JsonUtils.fromJson(json, Object.class);
+		} else {
+			return json;
+		}
 	}
 }

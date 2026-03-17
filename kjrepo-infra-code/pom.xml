@@ -19,8 +19,7 @@
 			<artifactId>kjrepo-infra-storage</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<!--
-		https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>

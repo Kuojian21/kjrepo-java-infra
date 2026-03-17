@@ -6,18 +6,10 @@ import com.kjrepo.infra.crypto.CryptoInfo;
 
 public class CipherInfo extends CryptoInfo<Cipher> {
 
-	private KEYTYPE keyType;
-	private String padding;
-	private String keyAlgorithm;
 	private String key;
-
-	public KEYTYPE getKeyType() {
-		return keyType;
-	}
-
-	public void setKeyType(KEYTYPE keyType) {
-		this.keyType = keyType;
-	}
+	private String keyAlgorithm;
+	private CipherInfoKeyType keyType;
+	private String padding;
 
 	public String getPadding() {
 		return padding;
@@ -43,8 +35,12 @@ public class CipherInfo extends CryptoInfo<Cipher> {
 		this.key = key;
 	}
 
-	public enum KEYTYPE {
-		KEY, PUBKEY, PRIKEY
+	public CipherInfoKeyType getKeyType() {
+		return keyType;
+	}
+
+	public void setKeyType(CipherInfoKeyType keyType) {
+		this.keyType = keyType;
 	}
 
 }

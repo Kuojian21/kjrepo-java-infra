@@ -1,24 +1,18 @@
 package com.kjrepo.infra.monitor.mx.reporter;
 
 import java.lang.management.GarbageCollectorMXBean;
-import java.util.List;
+import java.util.Map;
 
-import org.slf4j.Logger;
+import com.google.common.collect.ImmutableMap;
+import com.kjrepo.infra.monitor.mx.bean.GarbageCollectorReporterBean;
 
-import com.kjrepo.infra.common.logger.LoggerUtils;
-import com.kjrepo.infra.common.number.N_humanUtils;
-
-public class GarbageCollectorIReporter extends AbstractIReporter<GarbageCollectorIReporterBean> {
-
-	private final Logger logger = LoggerUtils.logger(getClass());
+public class GarbageCollectorIReporter extends AbstractIReporter<GarbageCollectorMXBean, GarbageCollectorReporterBean> {
 
 	@Override
-	public void report(GarbageCollectorIReporterBean data) {
-		List<GarbageCollectorMXBean> beans = data.data();
-		beans.forEach(bean -> {
-			logger.info("garbage-collector name:{} count:{} time:{}", bean.getName(), bean.getCollectionCount(),
-					N_humanUtils.formatMills(bean.getCollectionTime()));
-		});
+	public Map<String, Object> doReport(GarbageCollectorMXBean bean) {
+		return ImmutableMap.of("memoryPoolNames", bean.getMemoryPoolNames(), //
+				"collectionCount", bean.getCollectionCount(), //
+				"collectionTime", bean.getCollectionTime() //
+		);
 	}
-
 }

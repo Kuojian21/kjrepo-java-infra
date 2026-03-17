@@ -15,7 +15,6 @@ public class BinlogRunnerServer extends AbstractRunnerServer<BinlogRunner> {
 
 	@Override
 	protected void doRun(BinlogRunner runner) {
-//		runners.forEach(runner -> {
 		new Thread(() -> {
 			try {
 				BinlogLoginInfo bean = RegisterFactory.getContext(runner.getClass()).getRegister(BinlogLoginInfo.class)
@@ -36,8 +35,6 @@ public class BinlogRunnerServer extends AbstractRunnerServer<BinlogRunner> {
 				logger.error("", e);
 			}
 		}).start();
-//		});
-//		return this;
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import com.annimon.stream.Stream;
+import com.google.common.collect.Lists;
 import com.kjrepo.infra.common.info.Pair;
 import com.kjrepo.infra.common.lazy.LazySupplier;
 import com.kjrepo.infra.storage.db.model.KdbProperty;
@@ -20,26 +21,30 @@ public class SqlUpsertBuilder extends SqlInsertBuilder {
 
 	public SqlUpsertBuilder(List<Pair<String, Object>> update) {
 		this.sql = LazySupplier.wrap(() -> {
+			List<Pair<String, Object>> iUpdate = Lists.newArrayList(update);
+			model().updateProperties().forEach(p -> {
+				iUpdate.add(Pair.pair(p.column(), null));
+			});
 			StringBuilder sql = new StringBuilder().append(super.sql());
 			switch (dialect()) {
 			case MySQL:
-				return sql.append(" ON DUPLICATE KEY UPDATE ").append(StringUtils.join(Stream.of(update).map(e -> {
+				return sql.append(" ON DUPLICATE KEY UPDATE ").append(StringUtils.join(Stream.of(iUpdate).map(e -> {
 					KdbProperty property = model().getProperty(e.getKey());
 					if (e.getValue() instanceof SqlValueExpr) {
 						return property.column() + " = " + ((SqlValueExpr) e.getValue()).expr();
 					}
 					String var = SqlUtils.var();
-					valueMap().put(var, property.cast(e.getValue()));
+					valueMap().put(var, property.value_update(e.getValue()));
 					return property.column() + " = :" + var;
 				}).toList(), ",")).toString();
 			case PostgreSQL:
-				return sql.append(" ON CONFLICT DO UPDATE SET ").append(StringUtils.join(Stream.of(update).map(e -> {
+				return sql.append(" ON CONFLICT DO UPDATE SET ").append(StringUtils.join(Stream.of(iUpdate).map(e -> {
 					KdbProperty property = model().getProperty(e.getKey());
 					if (e.getValue() instanceof SqlValueExpr) {
 						return property.column() + " = " + ((SqlValueExpr) e.getValue()).expr();
 					}
 					String var = SqlUtils.var();
-					valueMap().put(var, property.cast(e.getValue()));
+					valueMap().put(var, property.value_update(e.getValue()));
 					return property.column() + " = :" + var;
 				}).toList(), ",")).toString();
 			case H2:
