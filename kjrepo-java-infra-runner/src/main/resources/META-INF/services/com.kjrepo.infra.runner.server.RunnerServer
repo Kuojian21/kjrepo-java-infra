@@ -1,0 +1,6 @@
+com.kjrepo.infra.runner.mq.kafka.server.KafkaRunnerServer
+com.kjrepo.infra.runner.mq.rocket.server.RocketRunnerServer
+com.kjrepo.infra.runner.rpc.grpc.server.GrpcRunnerServer
+com.kjrepo.infra.runner.sch.ksch.server.KschRunnerServer
+com.kjrepo.infra.runner.sch.quatz.server.QuatzRunnerServer
+com.kjrepo.infra.runner.simple.server.SimpleRunnerServer

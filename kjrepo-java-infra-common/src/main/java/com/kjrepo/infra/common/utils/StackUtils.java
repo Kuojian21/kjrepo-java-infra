@@ -1,0 +1,32 @@
+package com.kjrepo.infra.common.utils;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.annimon.stream.Stream;
+import com.kjrepo.infra.common.logger.LoggerUtils;
+
+public class StackUtils {
+
+	public static String firstBusinessInvokerClassname() {
+		return firstBusinessInvokerElement().getClassName();
+	}
+
+	public static StackTraceElement firstBusinessInvokerElement() {
+		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+		StackTraceElement element = Stream.of(elements) //
+				.filter(e -> StringUtils.isNotEmpty(e.getClassName())) //
+				.filter(e -> !e.getClassName().startsWith("java.")) //
+				.filter(e -> !e.getClassName().startsWith("javax.")) //
+				.filter(e -> !e.getClassName().startsWith("jdk.internal.")) //
+				.filter(e -> !e.getClassName().startsWith("sun.")) //
+				.filter(e -> !e.getClassName().startsWith("com.kjrepo.infra")) //
+				.findFirst().orElse(elements[1]);
+		if (!"<clinit>".equals(element.getMethodName()) && !"<init>".equals(element.getMethodName())) {
+			LoggerUtils.logger(StackUtils.class).error(
+					"please invoke this method in <clinit> or <init> method!!! location:{}.{}:{}",
+					element.getClassName(), element.getMethodName(), element.getLineNumber());
+		}
+		return element;
+	}
+
+}

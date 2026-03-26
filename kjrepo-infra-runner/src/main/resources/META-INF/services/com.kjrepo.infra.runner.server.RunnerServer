@@ -1,9 +1,0 @@
-#com.kjrepo.infra.runner.binlog.BinlogRunnerServer
-#com.kjrepo.infra.runner.mq.kafka.KafkaRunnerServer
-#com.kjrepo.infra.runner.mq.rocket.RocketRunnerServer
-#com.kjrepo.infra.runner.rpc.grpc.GrpcRunnerServer
-#com.kjrepo.infra.runner.rpc.grpc2.Grpc2RunnerServer
-com.kjrepo.infra.runner.sch.ksch.KschRunnerServer
-com.kjrepo.infra.runner.sch.quatz.QuatzRunnerServer
-com.kjrepo.infra.runner.simple.SimpleRunnerServer
-

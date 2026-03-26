@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>kjrepo-java-infra</groupId>
+		<artifactId>kjrepo-java-infra</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>kjrepo-java-infra-thread</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>kjrepo-java-infra</groupId>
+			<artifactId>kjrepo-java-infra-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>kjrepo-java-infra</groupId>
+			<artifactId>kjrepo-java-infra-trace</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>

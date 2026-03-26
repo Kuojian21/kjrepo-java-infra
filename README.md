@@ -70,13 +70,11 @@ smtp.getResource().send(......);
     - com.kjrepo.infra.crypto.signature.SignatureSign
     - com.kjrepo.infra.crypto.signature.SignatureVertify
 
-### 7. distrib:分布式组件
-- com.kjrepo.infra.distrib.cache.DLoadingCache<K, V>
-- com.kjrepo.infra.distrib.lock.DLock
+### 7. dlock:分布式锁组件
+- com.kjrepo.infra.dlock.DLock
 
 ### 8. executor:执行器组件
-- com.kjrepo.infra.executor.executor.Executor<T>
-- com.kjrepo.infra.executor.pool.PoolExecutor<T, I>
+- com.kjrepo.infra.executor.Executor<T>
 
 ### 9. monitor:监控组件
 - 系统监控：内存、线程等
@@ -107,12 +105,11 @@ smtp.getResource().send(......);
 ### 12. register:配置组件
 - com.kjrepo.infra.register.context.IRegisterContext
 - com.kjrepo.infra.register.group.context.IGroupRegisterContext
+- com.kjrepo.infra.register.kcache.KLoadingCache<K, V>
 - com.kjrepo.infra.register.kconf.Kconf<T>
 - com.kjrepo.infra.register.resource.IResource<I, R>
 
-### 13. reporter
-
-### 14. runner
+### 13. runner
 - com.kjrepo.infra.runner.binlog.BinlogRunner
 - com.kjrepo.infra.runner.mq.kafka.KafkaRunner<K, V>
 - com.kjrepo.infra.runner.mq.rocket.RocketRunner
@@ -123,15 +120,15 @@ smtp.getResource().send(......);
 - com.kjrepo.infra.runner.simple.SimpleRunner
 - com.kjrepo.infra.runner.server.RunnerServerMain
 
-### 15. script
+### 14. script
 - com.kjrepo.infra.script.utils.ScriptUtils
 
-### 16. server
+### 15. server
 - com.kjrepo.infra.server.jetty.JettyServer
 - com.kjrepo.infra.server.startup.Startable
 - com.kjrepo.infra.server.startup.StartableMain
 
-### 17. storge
+### 16. storge
 - db
     - com.kjrepo.infra.storage.db.jdbc.Kjdbc<T>
     - com.kjrepo.infra.storage.db.jdbc.KjdbcRepository
@@ -170,7 +167,7 @@ smtp.getResource().send(......);
 - memcache
     - com.kjrepo.infra.storage.spy.SpyRepository
 
-### 18. text
+### 17. text
 - json
     - com.kjrepo.infra.text.json.ConfigUtils
     - com.kjrepo.infra.text.json.JsonUtils
@@ -183,11 +180,11 @@ smtp.getResource().send(......);
 - xml
     - 
 
-### 19. thread
+### 18. thread
 - com.kjrepo.infra.thread.pool.KrExecutors
 - com.kjrepo.infra.thread.utils.ThreadHelper
 
-### 20. trace
+### 19. trace
 - 跟踪
 
 ## 三 Maven依赖
